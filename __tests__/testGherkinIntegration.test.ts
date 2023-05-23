@@ -4,9 +4,9 @@ import ToGherkin from "../src/theory/parser";
 
 describe("Verifying the code generation for the multiple test steps", function () {
 	const parser = new ToGherkin();
-	parser.feed(readMockData("AddingRemovingElements.side"));
+	parser.feed(readMockData("Adding&RemovingElements.side"));
 	const expectedFeatureFile = readExpectation(
-		"AddingRemovingElement.feature"
+		"Adding&RemovingElements.feature"
 	);
 
 	test("Parsing all the test cases", function () {
