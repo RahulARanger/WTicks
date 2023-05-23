@@ -1,0 +1,135 @@
+{
+	"id": "2bfacec4-ea7a-48c4-bdfe-22d693069b8d",
+	"version": "2.0",
+	"name": "Adding and Removing an Element in the web app",
+	"url": "https://the-internet.herokuapp.com/",
+	"tests": [
+		{
+			"id": "230fa3c9-362e-4173-8ead-66c052dc68d9",
+			"name": "Given I open a test case for adding/removing elements",
+			"commands": [
+				{
+					"id": "546763d0-71c4-4ab2-858d-ca8641a22cb5",
+					"comment": "",
+					"command": "open",
+					"target": "https://the-internet.herokuapp.com/",
+					"targets": [],
+					"value": ""
+				},
+				{
+					"id": "e772e7c1-8730-414a-bbad-a3bd1cc0580c",
+					"comment": "",
+					"command": "setWindowSize",
+					"target": "1296x736",
+					"targets": [],
+					"value": ""
+				},
+				{
+					"id": "a542d723-a426-43ff-aa7d-89822b4e9303",
+					"comment": "",
+					"command": "click",
+					"target": "linkText=Add/Remove Elements",
+					"targets": [
+						[
+							"linkText=Add/Remove Elements",
+							"linkText"
+						],
+						[
+							"css=li:nth-child(2) > a",
+							"css:finder"
+						],
+						[
+							"xpath=//a[contains(text(),'Add/Remove Elements')]",
+							"xpath:link"
+						],
+						[
+							"xpath=//div[@id='content']/ul/li[2]/a",
+							"xpath:idRelative"
+						],
+						[
+							"xpath=//a[contains(@href, '/add_remove_elements/')]",
+							"xpath:href"
+						],
+						[
+							"xpath=//li[2]/a",
+							"xpath:position"
+						],
+						[
+							"xpath=//a[contains(.,'Add/Remove Elements')]",
+							"xpath:innerText"
+						]
+					],
+					"value": ""
+				}
+			]
+		},
+		{
+			"id": "2936ee07-e298-4e8f-8769-16603c317431",
+			"name": "Then I will click on Add Element",
+			"commands": [
+				{
+					"id": "59f0080a-df34-40d0-8bb8-63309031e38e",
+					"comment": "",
+					"command": "run",
+					"target": "Given I open test case for adding / removing elements",
+					"targets": [],
+					"value": ""
+				},
+				{
+					"id": "047a0cb3-db5d-4ff7-8d25-567d1f227a28",
+					"comment": "",
+					"command": "click",
+					"target": "css=button",
+					"targets": [
+						[
+							"css=button",
+							"css:finder"
+						],
+						[
+							"xpath=//button[@onclick='addElement()']",
+							"xpath:attributes"
+						],
+						[
+							"xpath=//div[@id='content']/div/button",
+							"xpath:idRelative"
+						],
+						[
+							"xpath=//button",
+							"xpath:position"
+						],
+						[
+							"xpath=//button[contains(.,'Add Element')]",
+							"xpath:innerText"
+						]
+					],
+					"value": ""
+				},
+				{
+					"id": "f53b30ea-8ec6-4b2c-a9ec-801f636e8992",
+					"comment": "",
+					"command": "assertElementPresent",
+					"target": "css=.added-manually",
+					"targets": [],
+					"value": "true"
+				}
+			]
+		}
+	],
+	"suites": [
+		{
+			"id": "90f25091-d413-472f-9e66-35569716293b",
+			"name": "Assertion for Adding and Removing the Elements",
+			"persistSession": true,
+			"parallel": false,
+			"timeout": 300,
+			"tests": [
+				"230fa3c9-362e-4173-8ead-66c052dc68d9",
+				"2936ee07-e298-4e8f-8769-16603c317431"
+			]
+		}
+	],
+	"urls": [
+		"https://the-internet.herokuapp.com/"
+	],
+	"plugins": []
+}
