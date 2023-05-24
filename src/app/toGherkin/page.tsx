@@ -6,6 +6,11 @@ import Box from "@mui/material/Box";
 
 export default class HomePage extends Component<{}, ToGherkinState> {
 	state: ToGherkinState = { fileUploadedRaw: "" };
+
+	onUpload(uploadString: string): void {
+		return this.setState({ fileUploadedRaw: uploadString });
+	}
+
 	render() {
 		return (
 			<>

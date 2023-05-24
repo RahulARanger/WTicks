@@ -7,6 +7,7 @@ import UploadIcon from "@mui/icons-material/Upload";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import uploadFileStyles from "@/styles/uploadFile.module.sass";
+import { motion } from "framer-motion";
 
 // class File{
 // 	const [selectedFile, setSelectedFile] = useState(null);
@@ -71,7 +72,7 @@ export default class UploadFile extends Component<
 		});
 	}
 
-	render(): ReactNode {
+	renderInsides(): ReactNode {
 		return (
 			<>
 				<input
@@ -104,21 +105,38 @@ export default class UploadFile extends Component<
 									Drag and drop to upload .side file
 								</Typography>
 							</Stack>
-							{this.state.selectedFile ? (
-								<Typography
-									sx={{ mt: "12px" }}
-									variant="subtitle2"
-								>
-									File Selected:{" "}
-									{this.state.selectedFile.name}
-								</Typography>
-							) : (
-								<></>
-							)}
 						</Paper>
 					</label>
 				</Stack>
 			</>
+		);
+	}
+
+	render(): ReactNode {
+		return (
+			<motion.div
+				style={{
+					width: "100%",
+					height: "100%",
+					// display: this.state.selectedFile ? "unset" : "block",
+				}}
+				animate={{
+					x: 10,
+					transition: {
+						duration: 0.4,
+						ease: "easeOut",
+						bounce: 3,
+					},
+				}}
+				exit={{
+					x: -1e3,
+				}}
+				// onAnimationEnd={(event) => {
+				// 	event.currentTarget.style.display = "none";
+				// }}
+			>
+				{this.renderInsides()}
+			</motion.div>
 		);
 	}
 }
