@@ -1,78 +1,20 @@
-interface TestSuite {
-	id: string;
-	name: string;
-	persistSession: boolean;
-	parallel: boolean;
-	timeout: number;
-	tests: Array<string>;
-}
-
-interface ParsedSuite {
-	steps: Array<string>;
-	name: string;
-}
-
-interface Command {
-	id: string;
-	comment: string;
-	command: string;
-	target: string;
-	targets: Array<string>;
-	value: string;
-}
-
-interface Test {
-	id: string;
-	name: string;
-	commands: Array<Command>;
-}
-
-interface SideScript {
-	id: string;
-	version: "2.0";
-	name: string;
-	url: string;
-	tests: Array<Test>;
-	suites: Array<TestSuite>;
-}
-
-interface ParsedTestCase {
-	step_name: string;
-	commands: Array<ParsedTestStep>;
-	id: string;
-}
-
-interface ParsedTestStep {
-	isLocator: boolean;
-	target: string;
-	value: string;
-	command_name: string;
-}
-
-export function generateClassMethod(
-	method_name: string,
-	locator_path: string
-): string {
-	return [
-		"\n\tget ",
-		method_name,
-		"(){\n",
-		"\t\treturn ",
-		`$("${locator_path}");`,
-		"\n\t}",
-	].join("");
-}
-
-export function generateClass(methods: Array<string>): string {
-	if (!methods.length) return "";
-	return ["\nclass Locators {", ...methods, "\n}\n"].join("");
-}
+import {
+	TestSuite,
+	Test,
+	ParsedSuite,
+	ParsedTestCase,
+	ParsedTestStep,
+	Command,
+	SideScript,
+} from "./sharedTypes";
+import { generateClass, generateClassMethod } from "./scriptGenerators";
 
 abstract class GeneralizeVariable {
 	parsed?: SideScript;
 	parsedTestCases: { [key: string]: ParsedTestCase } = {};
 	locators: { [key: string]: string } = {};
-	var_names = new Set<string>();
+	func_names = new Set<string>();
+	store_things: { [key: string]: string | number } = {};
 	test_var_name = /^[a-zA-Z_$][a-zA-Z_$0-9]*$/;
 	parsedSuites: Array<ParsedSuite> = [];
 
@@ -123,7 +65,7 @@ abstract class GeneralizeVariable {
 		}
 	}
 
-	generate_random_name(): string {
+	generate_random_name(length: number): string {
 		const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		return Array(length)
 			.fill(true)
@@ -135,7 +77,7 @@ abstract class GeneralizeVariable {
 		if (name === false) return "";
 
 		const purified = name.replaceAll("^[^a-zA-Z_$]|[^0-9a-zA-Z_$]", "_");
-		if (this.var_names.has(purified)) return this.generate_name(false);
+		if (this.func_names.has(purified)) return this.generate_name(false);
 		return purified;
 	}
 
@@ -144,14 +86,14 @@ abstract class GeneralizeVariable {
 		if (this.locators[location]?.length > 0) return location;
 
 		let func_name = var_name;
-		const isUsed = this.var_names.has(func_name);
+		const isUsed = this.func_names.has(func_name);
 		const isNotValid = !this.test_var_name.test(func_name);
 
 		this.locators[location] =
 			isNotValid || isUsed
 				? this.generate_name(isUsed ? false : func_name)
 				: func_name;
-		this.var_names.add(var_name);
+		this.func_names.add(var_name);
 
 		return location;
 	}
@@ -159,13 +101,20 @@ abstract class GeneralizeVariable {
 	generateLocatorClass(): string {
 		return generateClass(
 			Object.keys(this.locators).map((key) =>
-				generateClassMethod(this.locators[key], key)
+				generateClassMethod(
+					this.locators[key] || this.generate_random_name(6),
+					key
+				)
 			)
 		);
 	}
 
 	hasSuites(): boolean {
-		return (this.parsed?.suites.length || 0) > 0;
+		return (
+			this.parsed?.suites.some((suite) => {
+				return suite.tests.length > 0;
+			}) || false
+		);
 	}
 }
 
@@ -193,27 +142,12 @@ export default class ToGherkin extends GeneralizeVariable {
 	}
 
 	parseTestStep(testStep: Command): false | ParsedTestStep {
-		// switch (
-		// 	testStep.command
-		// 	// unsupported commands here
-		// ) {
-		// }
-		// supported commands here
-		switch (testStep.command) {
-			case "type":
-			case "click":
-				return {
-					isLocator: true,
-					target: this.handleLocator(
-						testStep.target,
-						testStep.comment
-					),
-					value: testStep.value,
-					command_name: testStep.command,
-				};
-			default:
-				return false;
-		}
+		return {
+			isLocator: true,
+			target: this.handleLocator(testStep.target, testStep.comment),
+			value: testStep.value,
+			command_name: testStep.command,
+		};
 	}
 
 	parseSuite(suite: TestSuite): boolean {
@@ -262,3 +196,5 @@ export interface DispatchedGherkinMessage {
 	action: "test-step" | "test-case" | "test-scenario";
 	data: boolean | string;
 }
+
+// TODO: Write a react compatible class

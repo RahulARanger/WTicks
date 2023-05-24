@@ -22,4 +22,23 @@ describe("Verifying the code generation for the multiple test steps", function (
 	test("Generating the feature file", function () {
 		expect(parser.generateGherkinFile()).toBe(expectedFeatureFile);
 	});
+
+	// test("Generating the locators class", function () {
+	// 	expect(Array.from(parser.var_names)).toHaveLength(1); // because none of the locators are named by the user
+
+	// 	// names are generated once the generateLocatorClass is called
+	// 	const classString = parser.generateLocatorClass();
+	// 	expect(classString).toMatch(/^\nclass Locators {\n/);
+	// 	expect(classString).toMatch(/}\n$/);
+	// });
+});
+
+describe("Verifying if the scripts with no suites are detected", function () {
+	test("Verifying the case if there are no test suites", function () {
+		const parser = new ToGherkin();
+		parser.feed(readMockData("SingleTest-Scenario.side"));
+
+		expect(parser.isValidFile()).toBe(false);
+		expect(parser.hasSuites()).toBe(false);
+	});
 });
