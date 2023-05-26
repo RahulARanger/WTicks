@@ -1,5 +1,13 @@
 import { LocationResult, ParsedTestStep } from "./sharedTypes";
 
+function oppPrefix(isOpposite: boolean): string {
+	return isOpposite ? "not." : "";
+}
+
+function browserAssertion(isOpposite: boolean) {
+	return `await expect(browser).${oppPrefix(isOpposite)}`;
+}
+
 export function mapSteps(
 	step: ParsedTestStep,
 	locator_name: string
@@ -14,14 +22,17 @@ export function mapSteps(
 
 	// supported
 
-	const template =
-		"\t" + step.isLocator
-			? step.command_name.startsWith("assert")
-				? `await expect(locators.${locator_name})`
-				: `await locators.${locator_name}.`
-			: "await";
+	const isOpposite = step.command_name.startsWith("assertNot");
 
-	switch (step.command_name) {
+	const template = !step.isLocator
+		? "await "
+		: step.command_name.startsWith("assert")
+		? `await expect(locators.${locator_name}).${oppPrefix(isOpposite)}`
+		: `await locators.${locator_name}.`;
+
+	switch (
+		isOpposite ? step.command_name.replace("Not", "") : step.command_name
+	) {
 		case "click": {
 			return template + "click();";
 		}
@@ -30,12 +41,12 @@ export function mapSteps(
 		}
 
 		case "open": {
-			return `browser.url("${step.value}");`;
+			return template + `browser.url("${step.target}");`;
 		}
 
 		case "setWindowSize": {
 			const [width, height] = step.target.split("x");
-			return `browser.size(${width}, ${height})`;
+			return template + `browser.setWindowSize(${width}, ${height});`;
 		}
 
 		// assertions
@@ -44,24 +55,43 @@ export function mapSteps(
 			return template + `.toHaveText("${step.value}")`;
 		}
 		case "assertTitle": {
-			return `await expect(browser).toHaveTitle(${step.value});`;
+			return browserAssertion(isOpposite) + `toHaveTitle(${step.value});`;
 		}
 
 		case "assertElementPresent": {
-			return `await expect(locators.${locator_name}).toBeDisplayed();`;
+			return template + `toBeDisplayed();`;
+		}
+
+		case "assertEditable": {
+			return template + `toBeEnabled();`;
+		}
+
+		case "assertChecked": {
+			return template + `toBeChecked();`;
 		}
 
 		// browser actions
 		case "pause": {
-			return `browser.pause(${step.value});`;
+			return template + `browser.pause(${step.value});`;
 		}
 
 		case "executeScript": {
-			return `browser.execute(${step.value});`;
+			return template + `browser.execute(${step.value});`;
 		}
 
 		case "waitForVisible": {
 			return template + `waitForDisplayed(${step.value})`;
+		}
+
+		case "debugger": {
+			console.warn(
+				"Not Recommended to use debugger mode for script generation"
+			);
+			return template + "debug();";
+		}
+
+		case "echo": {
+			return `console.log("${step.target}");`;
 		}
 
 		default: {

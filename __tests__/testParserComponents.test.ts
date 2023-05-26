@@ -111,6 +111,69 @@ describe("Validating the step mappings", function () {
 			},
 			output: "await expect(locators.locator_name).toBeDisplayed();",
 		},
+		{
+			input: {
+				isLocator: false,
+				target: "1296x736",
+				command_name: "setWindowSize",
+				value: "",
+			},
+			output: "await browser.setWindowSize(1296, 736);",
+		},
+		{
+			input: {
+				isLocator: false,
+				target: "https://the-internet.herokuapp.com/",
+				command_name: "open",
+				value: "",
+			},
+			output: `await browser.url("https://the-internet.herokuapp.com/");`,
+		},
+		{
+			input: {
+				isLocator: true,
+				target: "input#selected",
+				command_name: "assertEditable",
+				value: "",
+			},
+			output: "await expect(locators.locator_name).toBeEnabled();",
+		},
+		{
+			input: {
+				isLocator: true,
+				target: "input#selected",
+				command_name: "assertNotEditable",
+				value: "",
+			},
+			output: "await expect(locators.locator_name).not.toBeEnabled();",
+		},
+		{
+			input: {
+				isLocator: true,
+				target: "input#checkbox",
+				command_name: "assertChecked",
+				value: "",
+			},
+			output: "await expect(locators.locator_name).toBeChecked();",
+		},
+		{
+			input: {
+				isLocator: true,
+				target: "input#checkbox",
+				command_name: "assertNotChecked",
+				value: "",
+			},
+			output: "await expect(locators.locator_name).not.toBeChecked();",
+		},
+		{
+			input: {
+				isLocator: false,
+				target: "Hello There",
+				command_name: "echo",
+				value: "",
+			},
+			output: `console.log("Hello There");`,
+		},
 	];
 
 	test.each<ExpectedStepResult>(tests)(
