@@ -42,9 +42,15 @@ export interface ParsedTestCase {
 	id: string;
 }
 
-export interface ParsedTestStep {
+export interface LocationResult {
+	target: string;
+	isLocator: boolean;
+}
+
+export interface ParsedTestStep extends LocationResult {
 	isLocator: boolean;
 	target: string;
 	value: string;
 	command_name: string;
+	parsed?: string | boolean;
 }

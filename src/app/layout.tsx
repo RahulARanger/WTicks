@@ -37,6 +37,9 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en">
+			<head>
+				<title>WTicks</title>
+			</head>
 			<body className={inter.className}>
 				<ThemeProvider theme={darkTheme}>
 					<CssBaseline />

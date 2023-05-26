@@ -6,10 +6,13 @@ import {
 	ParsedTestStep,
 	Command,
 	SideScript,
+	LocationResult,
 } from "./sharedTypes";
 import { generateClass, generateClassMethod } from "./scriptGenerators";
+import { mapSteps, parseLocators } from "./stepMapping";
 
 abstract class GeneralizeVariable {
+	testMap: { [key: string]: ParsedTestCase } = {};
 	parsed?: SideScript;
 	parsedTestCases: { [key: string]: ParsedTestCase } = {};
 	locators: { [key: string]: string } = {};
@@ -19,50 +22,9 @@ abstract class GeneralizeVariable {
 	parsedSuites: Array<ParsedSuite> = [];
 
 	abstract frameWorkType: string;
-	abstract parseTestCase(testCase: Test): boolean; // returns true if passed else false
-	abstract parseTestStep(testStep: Command): false | ParsedTestStep; // WebdriverIO step
-	abstract parseSuite(suite: TestSuite): boolean; // returns true if passed else false
 
 	feed(rawString: string) {
 		this.parsed = JSON.parse(rawString);
-	}
-
-	understandTestCases(): boolean {
-		// these are our Gherkin Test Steps
-		const tests = this.parsed?.tests || [];
-		return tests.every(this.parseTestCase.bind(this));
-	}
-
-	understandSuites(): boolean {
-		if (!this.parsed?.suites.length) return false;
-		return this.parsed.suites.every(this.parseSuite.bind(this));
-	}
-
-	_handleLocator(locator: string): string {
-		const strategy = locator.substring(0, locator.indexOf("="));
-		const value = locator.substring(locator.indexOf("=") + 1);
-
-		switch (strategy) {
-			case "id":
-				return `#${value}`;
-			case "name":
-				return `[name='${value}']`;
-
-			case "class":
-				return `.${value}`;
-			case "linkText":
-				return `=${value}`;
-			case "partialLink":
-				return `*=${value}`;
-
-			case "tag":
-			case "css":
-			case "xpath":
-				return value;
-
-			default:
-				throw new Error(`Unsupported locator strategy: ${strategy}`);
-		}
 	}
 
 	generate_random_name(length: number): string {
@@ -76,26 +38,10 @@ abstract class GeneralizeVariable {
 	generate_name(name: string | false): string {
 		if (name === false) return "";
 
+		// if the name given by the user is not valid then we replace the spaces or small things with _
 		const purified = name.replaceAll("^[^a-zA-Z_$]|[^0-9a-zA-Z_$]", "_");
 		if (this.func_names.has(purified)) return this.generate_name(false);
 		return purified;
-	}
-
-	handleLocator(locator: string, var_name: string): string {
-		const location = this._handleLocator(locator);
-		if (this.locators[location]?.length > 0) return location;
-
-		let func_name = var_name;
-		const isUsed = this.func_names.has(func_name);
-		const isNotValid = !this.test_var_name.test(func_name);
-
-		this.locators[location] =
-			isNotValid || isUsed
-				? this.generate_name(isUsed ? false : func_name)
-				: func_name;
-		this.func_names.add(var_name);
-
-		return location;
 	}
 
 	generateLocatorClass(): string {
@@ -109,23 +55,58 @@ abstract class GeneralizeVariable {
 		);
 	}
 
-	hasSuites(): boolean {
-		return (
-			this.parsed?.suites.some((suite) => {
-				return suite.tests.length > 0;
-			}) || false
-		);
+	patchCommands(...test_ids: Array<string>) {
+		test_ids.forEach((test_id) => {
+			const test_case = this.parsedTestCases[test_id];
+			if (!test_case) return;
+			test_case.commands = test_case.commands.map((step) => {
+				if (step.parsed) return step;
+				const text = mapSteps(step, this.locators[step.target]);
+				return {
+					...step,
+					parsed: text,
+				};
+			});
+		});
 	}
-}
 
-export default class ToGherkin extends GeneralizeVariable {
-	frameWorkType: string = "Gherkin";
-	check = /^(Given|When|Then|And|But) .+$/;
+	patchNames() {
+		Object.keys(this.locators).forEach((key) => {
+			if (this.locators[key]) return;
+			this.locators[key] = this.generate_random_name(6);
+		});
+	}
+
+	handleLocator(locator: string, var_name: string): LocationResult {
+		const location = parseLocators(locator);
+
+		if (this.locators[location.target]?.length > 0) return location;
+
+		let func_name = var_name;
+		const isUsed = this.func_names.has(func_name);
+		const isNotValid = !this.test_var_name.test(func_name);
+
+		this.locators[location.target] =
+			isNotValid || isUsed
+				? this.generate_name(isUsed ? false : func_name)
+				: func_name;
+		this.func_names.add(var_name);
+
+		return location;
+	}
+
+	parseTestStep(testStep: Command): false | ParsedTestStep {
+		return {
+			value: testStep.value,
+			command_name: testStep.command,
+			...this.handleLocator(
+				testStep.target,
+				this.locators[testStep.target] || ""
+			),
+		};
+	}
 
 	parseTestCase(testCase: Test): boolean {
-		const name = testCase.name;
-		if (!this.check.test(name)) return false;
-
 		const commands = [];
 		for (let command of testCase.commands) {
 			const result = this.parseTestStep(command);
@@ -133,21 +114,12 @@ export default class ToGherkin extends GeneralizeVariable {
 		}
 
 		this.parsedTestCases[testCase.id] = {
-			step_name: name,
+			step_name: testCase.name,
 			commands,
 			id: testCase.id, // required for test case organization in suites
 		};
 
 		return true;
-	}
-
-	parseTestStep(testStep: Command): false | ParsedTestStep {
-		return {
-			isLocator: true,
-			target: this.handleLocator(testStep.target, testStep.comment),
-			value: testStep.value,
-			command_name: testStep.command,
-		};
 	}
 
 	parseSuite(suite: TestSuite): boolean {
@@ -169,9 +141,31 @@ export default class ToGherkin extends GeneralizeVariable {
 		return testSteps.length > 0;
 	}
 
-	isValidFile() {
-		return this.hasSuites() && this.parsed?.name;
+	parseTestCases() {
+		const tests = this.parsed?.tests || [];
+		return tests.every(this.parseTestCase.bind(this));
 	}
+
+	hasTests(suite: TestSuite): boolean {
+		return suite.tests.length > 0;
+	}
+
+	hasSuites(): boolean {
+		return this.parsed?.suites.some(this.hasTests.bind(this)) || false;
+	}
+
+	isValidFile(): boolean {
+		return this.hasSuites() && Boolean(this.parsed?.name);
+	}
+}
+
+export class ToStandaloneScript extends GeneralizeVariable {
+	frameWorkType: string = "Standalone";
+}
+
+export default class ToGherkin extends GeneralizeVariable {
+	frameWorkType: string = "Gherkin";
+	check = /^(Given|When|Then|And|But) .+$/;
 
 	genScenario(scenario: ParsedSuite): string {
 		return [
