@@ -1,7 +1,9 @@
-import { ToGherkinState } from "./homePageTypes";
+import { StandAloneScriptProps } from "./homePageTypes";
 
-export interface FileUploadProps {}
+export interface FileUploadProps extends StandAloneScriptProps {}
 
 export interface FileUploadState {
-	selectedFile: File | null;
+	fileSize: number;
+	isLoading: boolean;
+	error?: string;
 }

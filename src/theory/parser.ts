@@ -7,6 +7,7 @@ import {
 	Command,
 	SideScript,
 	LocationResult,
+	dispatcher,
 } from "./sharedTypes";
 import { generateClass, generateClassMethod } from "./scriptGenerators";
 import { mapSteps, parseLocators } from "./stepMapping";
@@ -20,11 +21,16 @@ abstract class GeneralizeVariable {
 	store_things: { [key: string]: string | number } = {};
 	test_var_name = /^[a-zA-Z_$][a-zA-Z_$0-9]*$/;
 	parsedSuites: Array<ParsedSuite> = [];
+	dispatcher?: dispatcher;
 
 	abstract frameWorkType: string;
 
 	feed(rawString: string) {
 		this.parsed = JSON.parse(rawString);
+	}
+
+	feedDispatcher(dispatcher: dispatcher) {
+		this.dispatcher = dispatcher;
 	}
 
 	generate_random_name(length: number): string {
@@ -70,17 +76,19 @@ abstract class GeneralizeVariable {
 		});
 	}
 
-	patchNames() {
-		Object.keys(this.locators).forEach((key) => {
-			if (this.locators[key]) return;
-			this.locators[key] = this.generate_random_name(6);
+	needForPatch() {
+		return Object.keys(this.locators).every((key) => {
+			if (this.locators[key]) return true;
+			return false;
 		});
 	}
 
 	handleLocator(locator: string, var_name: string): LocationResult {
 		const location = parseLocators(locator);
 
+		// means it already has a name which is not ""
 		if (this.locators[location.target]?.length > 0) return location;
+		if (!location.isLocator) return location;
 
 		let func_name = var_name;
 		const isUsed = this.func_names.has(func_name);
@@ -119,7 +127,7 @@ abstract class GeneralizeVariable {
 			id: testCase.id, // required for test case organization in suites
 		};
 
-		return true;
+		return commands.length > 0;
 	}
 
 	parseSuite(suite: TestSuite): boolean {
@@ -155,12 +163,60 @@ abstract class GeneralizeVariable {
 	}
 
 	isValidFile(): boolean {
-		return this.hasSuites() && Boolean(this.parsed?.name);
+		return (
+			this.hasSuites() &&
+			Boolean(this.parsed?.name) &&
+			this.parsed?.version === "2.0"
+		);
 	}
 }
 
-export class ToStandaloneScript extends GeneralizeVariable {
+export abstract class Listener extends GeneralizeVariable {
+	parseTestCase(testCase: Test): boolean {
+		const result = super.parseTestCase(testCase);
+		if (!result)
+			this.dispatcher &&
+				this.dispatcher({
+					type: "parsedTestCase",
+					result: testCase.name,
+				});
+		return result;
+	}
+
+	parseTestCases(): boolean {
+		const result = super.parseTestCases();
+		this.dispatcher &&
+			this.dispatcher({
+				type: "parsedTestCases",
+				result: result,
+			});
+
+		return result;
+	}
+}
+
+export class ToStandaloneScript extends Listener {
 	frameWorkType: string = "Standalone";
+
+	genScript(): string {
+		const browser_options = `
+// if you are using browser runner to execute the scripts then you can ignore the below configuration for the browser
+const browser = await remote({
+	capabilities: {
+		browserName: 'chrome',
+		'goog:chromeOptions': {
+			args: process.env.CI ? ['headless', 'disable-gpu'] : []
+		}
+	}
+});
+`;
+		return [
+			`import { remote } from 'webdriverio';`,
+			`import {$} from "@wdio/globals";`,
+			browser_options,
+			this.generateLocatorClass(),
+		].join("");
+	}
 }
 
 export default class ToGherkin extends GeneralizeVariable {
@@ -186,9 +242,3 @@ export default class ToGherkin extends GeneralizeVariable {
 		].join("");
 	}
 }
-export interface DispatchedGherkinMessage {
-	action: "test-step" | "test-case" | "test-scenario";
-	data: boolean | string;
-}
-
-// TODO: Write a react compatible class

@@ -8,6 +8,8 @@ import Button from "@mui/material/Button";
 import UploadIcon from "@mui/icons-material/Upload";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import Skeleton from "@mui/material/Skeleton";
+import Alert from "@mui/material/Alert";
 import uploadFileStyles from "@/styles/uploadFile.module.sass";
 import { motion } from "framer-motion";
 
@@ -16,14 +18,29 @@ export default class UploadFile extends Component<
 	FileUploadState
 > {
 	uploadID = "file-upload";
-	state: FileUploadState = { selectedFile: null };
+	state: FileUploadState = { isLoading: false, fileSize: 0 };
 
 	async handleFileSelected(onChange: ChangeEvent<HTMLInputElement>) {
 		const fileUploaded = (onChange.target?.files || [])[0];
 		if (!fileUploaded) return;
-		this.setState({
-			selectedFile: fileUploaded,
-		});
+
+		const size = fileUploaded.size;
+		this.setState({ isLoading: true, fileSize: size });
+
+		return new Promise(async (resolve, reject) => {
+			try {
+				await this.props.dispatchDetails(await fileUploaded.text());
+			} catch (err) {
+				reject(String(err));
+			}
+			resolve(true);
+		})
+			.then(() => {
+				this.setState({ isLoading: false, error: "" });
+			})
+			.catch((err: string) => {
+				this.setState({ isLoading: false, error: err });
+			});
 	}
 
 	renderInsides(): ReactNode {
@@ -36,7 +53,6 @@ export default class UploadFile extends Component<
 					style={{ display: "none" }}
 					id={this.uploadID}
 				/>
-
 				<Stack className={uploadFileStyles.uploadFileBox}>
 					<motion.label
 						htmlFor={this.uploadID}
@@ -49,22 +65,65 @@ export default class UploadFile extends Component<
 							stiffness: 400,
 							damping: 10,
 						}}
+						layout
 					>
 						<Paper
 							elevation={1}
+							sx={{ p: 1 }}
 							className={uploadFileStyles.uploadFileInfoBox}
 						>
-							<Stack>
-								<Button
-									endIcon={<UploadIcon />}
-									component="span"
+							<motion.div
+								layout
+								style={{
+									display: "flex",
+									flexFlow: "column wrap",
+									justifyContent: "center",
+								}}
+							>
+								{this.state.isLoading ? (
+									<>
+										<Skeleton
+											width="100%"
+											sx={{ height: "60px" }}
+										/>
+									</>
+								) : (
+									<>
+										<Button
+											endIcon={<UploadIcon />}
+											component="span"
+										>
+											Upload File
+										</Button>
+									</>
+								)}
+								<Typography
+									variant={
+										this.state.isLoading &&
+										!this.state.error
+											? "subtitle2"
+											: "subtitle1"
+									}
+									sx={{ textAlign: "center" }}
 								>
-									Upload File
-								</Button>
-								<Typography variant="subtitle1">
-									Drag and drop to upload .side file
+									{this.state.isLoading
+										? `Validating the File Uploaded, size: ${
+												this.state.fileSize / 1e3
+										  } KB`
+										: "Drag and drop to upload .side file"}
 								</Typography>
-							</Stack>
+								{this.state.error ? (
+									<Alert
+										severity="error"
+										color="error"
+										sx={{ mt: "10px" }}
+									>
+										{`Failed to parse the file: ${this.state.error}`}
+									</Alert>
+								) : (
+									<></>
+								)}
+							</motion.div>
 						</Paper>
 					</motion.label>
 				</Stack>

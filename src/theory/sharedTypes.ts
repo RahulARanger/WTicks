@@ -54,3 +54,14 @@ export interface ParsedTestStep extends LocationResult {
 	command_name: string;
 	parsed?: string | boolean;
 }
+
+export interface ShareDetails {
+	type:
+		| "parsedTestCase"
+		| "parsedSuite"
+		| "patchedCommands"
+		| "parsedTestCases";
+	result: string | boolean;
+}
+
+export type dispatcher = (details: ShareDetails) => void;

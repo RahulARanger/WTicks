@@ -1,38 +1,92 @@
 "use client";
-import { Component, useState } from "react";
-import { ToGherkinState } from "@/types/homePageTypes";
-import Button from "@mui/material/Button";
-import Paper from "@mui/material/Paper";
-import { motion } from "framer-motion";
+import { Component, ReactNode } from "react";
+import UploadFile from "@/components/UploadFile";
+import {
+	StandAloneScriptProps,
+	StandAloneScriptState,
+} from "@/types/homePageTypes";
+import { ToStandaloneScript } from "@/theory/parser";
+import Header from "@/components/header";
+import Stack from "@mui/material/Stack";
+import SimpleScriptViewer from "@/components/textArea";
 import uploadFileStyles from "@/styles/uploadFile.module.sass";
-import Link from "next/link";
+import { TimelineComponent } from "@/components/timeline";
+import { PatchForm } from "@/components/patchForm";
 
-export default class HomePage extends Component<{}, ToGherkinState> {
-	state: ToGherkinState = { fileUploadedRaw: "" };
-	links: { [key: string]: string } = {
-		Standalone: "./converter/standalone",
-	};
+export default class StandaloneScript extends Component<
+	StandAloneScriptProps,
+	StandAloneScriptState
+> {
+	state: StandAloneScriptState = {};
 
-	onUpload(uploadString: string, selectedOption: string): void {
-		return this.setState({ fileUploadedRaw: uploadString });
+	async parseRaw(data: string) {
+		const parser = new ToStandaloneScript();
+		parser.feed(data);
+		if (!parser.isValidFile()) {
+			throw new Error("Does not have required suites");
+		}
+		this.setState({ scriptParser: parser });
 	}
 
-	render() {
+	askOrConfirmForPatch(didWeParse: boolean) {
+		const parser = this.state.scriptParser;
+		if (!parser) return;
+
+		if (didWeParse) this.setState({ needPatch: true });
+	}
+
+	renderIfNotUploaded(): ReactNode {
+		return <UploadFile dispatchDetails={this.parseRaw.bind(this)} />;
+	}
+
+	renderIfYetToParse(): ReactNode {
 		return (
 			<>
-				<motion.div className={uploadFileStyles.uploadFileBox}>
-					<Paper elevation={1} sx={{ p: "24px" }}>
-						{Object.keys(this.links).map((key) => {
-							return (
-								<Link href={this.links[key]}>
-									<Button color="primary" key={key}>
-										<motion.span>{key}</motion.span>
-									</Button>
-								</Link>
-							);
-						})}
-					</Paper>
-				</motion.div>
+				<Stack className={uploadFileStyles.normallyInsidePage}>
+					<Header />
+					<Stack
+						flexDirection="row"
+						sx={{
+							flexGrow: 0.89,
+							mt: "12px",
+							pl: "6px",
+							pr: "6px",
+						}}
+					>
+						{this.renderForPatching()}
+						{this.renderStepsDone()}
+					</Stack>
+				</Stack>
+			</>
+		);
+	}
+
+	renderForPatching(): ReactNode {
+		if (!this.state.scriptParser) return <></>;
+		if (this.state.patched) return this.renderAfterParsed();
+		if (!this.state.needPatch) return <></>;
+		return <PatchForm parser={this.state.scriptParser} />;
+	}
+
+	renderAfterParsed(): ReactNode {
+		return <></>;
+	}
+
+	renderStepsDone(): ReactNode {
+		return (
+			<TimelineComponent
+				parser={this.state.scriptParser}
+				patchThings={this.askOrConfirmForPatch.bind(this)}
+			/>
+		);
+	}
+
+	render(): ReactNode {
+		return (
+			<>
+				{!this.state.scriptParser
+					? this.renderIfNotUploaded()
+					: this.renderIfYetToParse()}
 			</>
 		);
 	}
