@@ -91,7 +91,7 @@ describe("Validating the step mappings", function () {
 				value: "",
 				command_name: "click",
 			},
-			output: `await locators.locator_name.click();`,
+			output: `await pageClass.locator_name.click();`,
 		},
 		{
 			input: {
@@ -100,7 +100,7 @@ describe("Validating the step mappings", function () {
 				command_name: "type",
 				value: "dummy_text",
 			},
-			output: `await locators.locator_name.setValue("dummy_text");`,
+			output: `await pageClass.locator_name.setValue("dummy_text");`,
 		},
 		{
 			input: {
@@ -109,7 +109,7 @@ describe("Validating the step mappings", function () {
 				command_name: "assertElementPresent",
 				value: "true",
 			},
-			output: "await expect(locators.locator_name).toBeDisplayed();",
+			output: "await expect(pageClass.locator_name).toBeDisplayed();",
 		},
 		{
 			input: {
@@ -136,7 +136,7 @@ describe("Validating the step mappings", function () {
 				command_name: "assertEditable",
 				value: "",
 			},
-			output: "await expect(locators.locator_name).toBeEnabled();",
+			output: "await expect(pageClass.locator_name).toBeEnabled();",
 		},
 		{
 			input: {
@@ -145,7 +145,7 @@ describe("Validating the step mappings", function () {
 				command_name: "assertNotEditable",
 				value: "",
 			},
-			output: "await expect(locators.locator_name).not.toBeEnabled();",
+			output: "await expect(pageClass.locator_name).not.toBeEnabled();",
 		},
 		{
 			input: {
@@ -154,7 +154,7 @@ describe("Validating the step mappings", function () {
 				command_name: "assertChecked",
 				value: "",
 			},
-			output: "await expect(locators.locator_name).toBeChecked();",
+			output: "await expect(pageClass.locator_name).toBeChecked();",
 		},
 		{
 			input: {
@@ -163,7 +163,7 @@ describe("Validating the step mappings", function () {
 				command_name: "assertNotChecked",
 				value: "",
 			},
-			output: "await expect(locators.locator_name).not.toBeChecked();",
+			output: "await expect(pageClass.locator_name).not.toBeChecked();",
 		},
 		{
 			input: {

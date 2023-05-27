@@ -15,7 +15,17 @@ export function mapSteps(
 	// unsupported but expected
 	switch (step.command_name) {
 		case "run": {
-			console.info("run is not referred in favour of BDD Approach");
+			console.info(
+				"run is ignored as we combine all the test scripts based on the parts of the scenario"
+			);
+			return true;
+		}
+
+		case "if":
+		case "while": {
+			console.info(
+				"found script related commands, hence skipping the step to parse"
+			);
 			return true;
 		}
 	}
@@ -27,12 +37,13 @@ export function mapSteps(
 	const template = !step.isLocator
 		? "await "
 		: step.command_name.startsWith("assert")
-		? `await expect(locators.${locator_name}).${oppPrefix(isOpposite)}`
-		: `await locators.${locator_name}.`;
+		? `await expect(pageClass.${locator_name}).${oppPrefix(isOpposite)}`
+		: `await pageClass.${locator_name}.`;
 
 	switch (
 		isOpposite ? step.command_name.replace("Not", "") : step.command_name
 	) {
+		case "check":
 		case "click": {
 			return template + "click();";
 		}
@@ -68,6 +79,14 @@ export function mapSteps(
 
 		case "assertChecked": {
 			return template + `toBeChecked();`;
+		}
+
+		case "assertText": {
+			return template + `toHaveText(${step.value});`;
+		}
+
+		case "assertValue": {
+			return template + `toHaveValue(${step.value});`;
 		}
 
 		// browser actions
