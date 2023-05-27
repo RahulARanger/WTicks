@@ -107,10 +107,7 @@ abstract class GeneralizeVariable {
 		return {
 			value: testStep.value,
 			command_name: testStep.command,
-			...this.handleLocator(
-				testStep.target,
-				this.locators[testStep.target] || ""
-			),
+			...this.handleLocator(testStep.target, testStep.comment || ""),
 		};
 	}
 

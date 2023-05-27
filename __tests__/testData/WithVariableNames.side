@@ -1,179 +1,365 @@
 {
-  "id": "12cf557d-37fe-41d1-b514-4fd20dcf1f65",
-  "version": "2.0",
-  "name": "WithVariableNames",
-  "url": "https://yticks.vercel.app/video",
-  "tests": [{
-    "id": "075a20a6-479d-44d7-b566-426b6a8505d5",
-    "name": "Given I have reached the URL",
-    "commands": [{
-      "id": "73082d8f-2473-4bff-80eb-02482b396b4d",
-      "comment": "",
-      "command": "setWindowSize",
-      "target": "1296x736",
-      "targets": [],
-      "value": ""
-    }, {
-      "id": "0b951729-bc6b-4309-ab70-357da65d4706",
-      "comment": "",
-      "command": "click",
-      "target": "id=:Ril56:",
-      "targets": [
-        ["id=:Ril56:", "id"],
-        ["name=yt-url", "name"],
-        ["css=#\\3ARil56\\3A", "css:finder"],
-        ["xpath=//input[@id=':Ril56:']", "xpath:attributes"],
-        ["xpath=//div[@id='__next']/nav/div/div[2]/div/input", "xpath:idRelative"],
-        ["xpath=//input", "xpath:position"]
-      ],
-      "value": ""
-    }]
-  }, {
-    "id": "15944829-b767-43ee-9262-097ac236fd5c",
-    "name": "Then I will set the wrong URL in the search bar then we will get error message",
-    "commands": [{
-      "id": "b325c4be-bdbf-4c71-9f0e-7f80ee62a94d",
-      "comment": "",
-      "command": "open",
-      "target": "https://yticks.vercel.app/video",
-      "targets": [],
-      "value": ""
-    }, {
-      "id": "558fa9ef-e7fe-4f41-8fc1-979d4fbc7dbc",
-      "comment": "",
-      "command": "setWindowSize",
-      "target": "518x480",
-      "targets": [],
-      "value": ""
-    }, {
-      "id": "3201b811-6bff-42a2-9ebd-d34e3b9c0b78",
-      "comment": "search_bar",
-      "command": "type",
-      "target": "id=:Ril56:",
-      "targets": [
-        ["id=:Ril56:", "id"],
-        ["name=yt-url", "name"],
-        ["css=#\\3ARil56\\3A", "css:finder"],
-        ["xpath=//input[@id=':Ril56:']", "xpath:attributes"],
-        ["xpath=//div[@id='__next']/nav/div/div[2]/div/input", "xpath:idRelative"],
-        ["xpath=//input", "xpath:position"]
-      ],
-      "value": "checking"
-    }, {
-      "id": "e373c3f3-3e7b-4a80-9f60-5bf9a05cf244",
-      "comment": "search_bar",
-      "command": "type",
-      "target": "id=:Ril56:",
-      "targets": [
-        ["id=:Ril56:", "id"],
-        ["name=yt-url", "name"],
-        ["css=#\\3ARil56\\3A", "css:finder"],
-        ["xpath=//input[@id=':Ril56:']", "xpath:attributes"],
-        ["xpath=//div[@id='__next']/nav/div/div[2]/div/input", "xpath:idRelative"],
-        ["xpath=//input", "xpath:position"]
-      ],
-      "value": "https://www.google.com"
-    }, {
-      "id": "83f0dc71-1fc8-487d-a3a0-961f5a119e5b",
-      "comment": "",
-      "command": "sendKeys",
-      "target": "id=:Ril56:",
-      "targets": [
-        ["id=:Ril56:", "id"],
-        ["name=yt-url", "name"],
-        ["css=#\\3ARil56\\3A", "css:finder"],
-        ["xpath=//input[@id=':Ril56:']", "xpath:attributes"],
-        ["xpath=//div[@id='__next']/nav/div/div[2]/div/input", "xpath:idRelative"],
-        ["xpath=//input", "xpath:position"]
-      ],
-      "value": "${KEY_ENTER}"
-    }, {
-      "id": "3f9654cb-967a-4248-a1bf-4b14918f5ae8",
-      "comment": "",
-      "command": "assertText",
-      "target": "id=:Ril56:-label",
-      "targets": [
-        ["id=:Ril56:-label", "id"],
-        ["css=#\\3ARil56\\3A-label", "css:finder"],
-        ["xpath=//label[@id=':Ril56:-label']", "xpath:attributes"],
-        ["xpath=//div[@id='__next']/nav/div/div[2]/label", "xpath:idRelative"],
-        ["xpath=//label", "xpath:position"],
-        ["xpath=//label[contains(.,'Paste a valid Youtube URL')]", "xpath:innerText"]
-      ],
-      "value": "Paste a valid Youtube URL"
-    }, {
-      "id": "61ba2f13-de94-4b9f-9e75-5126a836b5a0",
-      "comment": "",
-      "command": "type",
-      "target": "id=:Ril56:",
-      "targets": [
-        ["id=:Ril56:", "id"],
-        ["name=yt-url", "name"],
-        ["css=#\\3ARil56\\3A", "css:finder"],
-        ["xpath=//input[@id=':Ril56:']", "xpath:attributes"],
-        ["xpath=//div[@id='__next']/nav/div/div[2]/div/input", "xpath:idRelative"],
-        ["xpath=//input", "xpath:position"]
-      ],
-      "value": "https://www.youtube.com"
-    }, {
-      "id": "5c51e574-a57c-443c-b5ff-34922ce31a2e",
-      "comment": "",
-      "command": "sendKeys",
-      "target": "id=:Ril56:",
-      "targets": [
-        ["id=:Ril56:", "id"],
-        ["name=yt-url", "name"],
-        ["css=#\\3ARil56\\3A", "css:finder"],
-        ["xpath=//input[@id=':Ril56:']", "xpath:attributes"],
-        ["xpath=//div[@id='__next']/nav/div/div[2]/div/input", "xpath:idRelative"],
-        ["xpath=//input", "xpath:position"]
-      ],
-      "value": "${KEY_ENTER}"
-    }, {
-      "id": "e8b8c702-64bc-4ac1-9ba9-7bd3b3ed84a1",
-      "comment": "",
-      "command": "type",
-      "target": "id=:Ril56:",
-      "targets": [
-        ["id=:Ril56:", "id"],
-        ["name=yt-url", "name"],
-        ["css=#\\3ARil56\\3A", "css:finder"],
-        ["xpath=//input[@id=':Ril56:']", "xpath:attributes"],
-        ["xpath=//div[@id='__next']/nav/div/div[2]/div/input", "xpath:idRelative"],
-        ["xpath=//input", "xpath:position"]
-      ],
-      "value": "https://www.youtube.com/watch"
-    }, {
-      "id": "75769c0e-1eb6-447b-966d-c18f1d5eddcd",
-      "comment": "",
-      "command": "sendKeys",
-      "target": "id=:Ril56:",
-      "targets": [
-        ["id=:Ril56:", "id"],
-        ["name=yt-url", "name"],
-        ["css=#\\3ARil56\\3A", "css:finder"],
-        ["xpath=//input[@id=':Ril56:']", "xpath:attributes"],
-        ["xpath=//div[@id='__next']/nav/div/div[2]/div/input", "xpath:idRelative"],
-        ["xpath=//input", "xpath:position"]
-      ],
-      "value": "${KEY_ENTER}"
-    }, {
-      "id": "16ff7132-a7ef-4133-8891-4fd8db24bd49",
-      "comment": "",
-      "command": "assertElementPresent",
-      "target": "css=.MuiTypography-root",
-      "targets": [],
-      "value": ""
-    }]
-  }],
-  "suites": [{
-    "id": "116e6d91-3b23-4b41-b2f8-f2f507bd7ac8",
-    "name": "Default Suite",
-    "persistSession": false,
-    "parallel": false,
-    "timeout": 300,
-    "tests": ["075a20a6-479d-44d7-b566-426b6a8505d5"]
-  }],
-  "urls": ["https://yticks.vercel.app/"],
-  "plugins": []
+	"id": "12cf557d-37fe-41d1-b514-4fd20dcf1f65",
+	"version": "2.0",
+	"name": "WithVariableNames",
+	"url": "https://yticks.vercel.app/video",
+	"tests": [
+		{
+			"id": "075a20a6-479d-44d7-b566-426b6a8505d5",
+			"name": "Given I have reached the URL",
+			"commands": [
+				{
+					"id": "73082d8f-2473-4bff-80eb-02482b396b4d",
+					"comment": "",
+					"command": "setWindowSize",
+					"target": "1296x736",
+					"targets": [],
+					"value": ""
+				},
+				{
+					"id": "0b951729-bc6b-4309-ab70-357da65d4706",
+					"comment": "",
+					"command": "click",
+					"target": "id=:Ril56:",
+					"targets": [
+						[
+							"id=:Ril56:",
+							"id"
+						],
+						[
+							"name=yt-url",
+							"name"
+						],
+						[
+							"css=#\\3ARil56\\3A",
+							"css:finder"
+						],
+						[
+							"xpath=//input[@id=':Ril56:']",
+							"xpath:attributes"
+						],
+						[
+							"xpath=//div[@id='__next']/nav/div/div[2]/div/input",
+							"xpath:idRelative"
+						],
+						[
+							"xpath=//input",
+							"xpath:position"
+						]
+					],
+					"value": ""
+				}
+			]
+		},
+		{
+			"id": "15944829-b767-43ee-9262-097ac236fd5c",
+			"name": "Then I will set the wrong URL in the search bar then we will get error message",
+			"commands": [
+				{
+					"id": "b325c4be-bdbf-4c71-9f0e-7f80ee62a94d",
+					"comment": "",
+					"command": "open",
+					"target": "https://yticks.vercel.app/video",
+					"targets": [],
+					"value": ""
+				},
+				{
+					"id": "558fa9ef-e7fe-4f41-8fc1-979d4fbc7dbc",
+					"comment": "",
+					"command": "setWindowSize",
+					"target": "518x480",
+					"targets": [],
+					"value": ""
+				},
+				{
+					"id": "3201b811-6bff-42a2-9ebd-d34e3b9c0b78",
+					"comment": "search_bar",
+					"command": "type",
+					"target": "id=:Ril56:",
+					"targets": [
+						[
+							"id=:Ril56:",
+							"id"
+						],
+						[
+							"name=yt-url",
+							"name"
+						],
+						[
+							"css=#\\3ARil56\\3A",
+							"css:finder"
+						],
+						[
+							"xpath=//input[@id=':Ril56:']",
+							"xpath:attributes"
+						],
+						[
+							"xpath=//div[@id='__next']/nav/div/div[2]/div/input",
+							"xpath:idRelative"
+						],
+						[
+							"xpath=//input",
+							"xpath:position"
+						]
+					],
+					"value": "checking"
+				},
+				{
+					"id": "e373c3f3-3e7b-4a80-9f60-5bf9a05cf244",
+					"comment": "search_bar",
+					"command": "type",
+					"target": "id=:Ril56:",
+					"targets": [
+						[
+							"id=:Ril56:",
+							"id"
+						],
+						[
+							"name=yt-url",
+							"name"
+						],
+						[
+							"css=#\\3ARil56\\3A",
+							"css:finder"
+						],
+						[
+							"xpath=//input[@id=':Ril56:']",
+							"xpath:attributes"
+						],
+						[
+							"xpath=//div[@id='__next']/nav/div/div[2]/div/input",
+							"xpath:idRelative"
+						],
+						[
+							"xpath=//input",
+							"xpath:position"
+						]
+					],
+					"value": "https://www.google.com"
+				},
+				{
+					"id": "83f0dc71-1fc8-487d-a3a0-961f5a119e5b",
+					"comment": "",
+					"command": "sendKeys",
+					"target": "id=:Ril56:",
+					"targets": [
+						[
+							"id=:Ril56:",
+							"id"
+						],
+						[
+							"name=yt-url",
+							"name"
+						],
+						[
+							"css=#\\3ARil56\\3A",
+							"css:finder"
+						],
+						[
+							"xpath=//input[@id=':Ril56:']",
+							"xpath:attributes"
+						],
+						[
+							"xpath=//div[@id='__next']/nav/div/div[2]/div/input",
+							"xpath:idRelative"
+						],
+						[
+							"xpath=//input",
+							"xpath:position"
+						]
+					],
+					"value": "${KEY_ENTER}"
+				},
+				{
+					"id": "3f9654cb-967a-4248-a1bf-4b14918f5ae8",
+					"comment": "",
+					"command": "assertText",
+					"target": "id=:Ril56:-label",
+					"targets": [
+						[
+							"id=:Ril56:-label",
+							"id"
+						],
+						[
+							"css=#\\3ARil56\\3A-label",
+							"css:finder"
+						],
+						[
+							"xpath=//label[@id=':Ril56:-label']",
+							"xpath:attributes"
+						],
+						[
+							"xpath=//div[@id='__next']/nav/div/div[2]/label",
+							"xpath:idRelative"
+						],
+						[
+							"xpath=//label",
+							"xpath:position"
+						],
+						[
+							"xpath=//label[contains(.,'Paste a valid Youtube URL')]",
+							"xpath:innerText"
+						]
+					],
+					"value": "Paste a valid Youtube URL"
+				},
+				{
+					"id": "61ba2f13-de94-4b9f-9e75-5126a836b5a0",
+					"comment": "",
+					"command": "type",
+					"target": "id=:Ril56:",
+					"targets": [
+						[
+							"id=:Ril56:",
+							"id"
+						],
+						[
+							"name=yt-url",
+							"name"
+						],
+						[
+							"css=#\\3ARil56\\3A",
+							"css:finder"
+						],
+						[
+							"xpath=//input[@id=':Ril56:']",
+							"xpath:attributes"
+						],
+						[
+							"xpath=//div[@id='__next']/nav/div/div[2]/div/input",
+							"xpath:idRelative"
+						],
+						[
+							"xpath=//input",
+							"xpath:position"
+						]
+					],
+					"value": "https://www.youtube.com"
+				},
+				{
+					"id": "5c51e574-a57c-443c-b5ff-34922ce31a2e",
+					"comment": "",
+					"command": "sendKeys",
+					"target": "id=:Ril56:",
+					"targets": [
+						[
+							"id=:Ril56:",
+							"id"
+						],
+						[
+							"name=yt-url",
+							"name"
+						],
+						[
+							"css=#\\3ARil56\\3A",
+							"css:finder"
+						],
+						[
+							"xpath=//input[@id=':Ril56:']",
+							"xpath:attributes"
+						],
+						[
+							"xpath=//div[@id='__next']/nav/div/div[2]/div/input",
+							"xpath:idRelative"
+						],
+						[
+							"xpath=//input",
+							"xpath:position"
+						]
+					],
+					"value": "${KEY_ENTER}"
+				},
+				{
+					"id": "e8b8c702-64bc-4ac1-9ba9-7bd3b3ed84a1",
+					"comment": "",
+					"command": "type",
+					"target": "id=:Ril56:",
+					"targets": [
+						[
+							"id=:Ril56:",
+							"id"
+						],
+						[
+							"name=yt-url",
+							"name"
+						],
+						[
+							"css=#\\3ARil56\\3A",
+							"css:finder"
+						],
+						[
+							"xpath=//input[@id=':Ril56:']",
+							"xpath:attributes"
+						],
+						[
+							"xpath=//div[@id='__next']/nav/div/div[2]/div/input",
+							"xpath:idRelative"
+						],
+						[
+							"xpath=//input",
+							"xpath:position"
+						]
+					],
+					"value": "https://www.youtube.com/watch"
+				},
+				{
+					"id": "75769c0e-1eb6-447b-966d-c18f1d5eddcd",
+					"comment": "",
+					"command": "sendKeys",
+					"target": "id=:Ril56:",
+					"targets": [
+						[
+							"id=:Ril56:",
+							"id"
+						],
+						[
+							"name=yt-url",
+							"name"
+						],
+						[
+							"css=#\\3ARil56\\3A",
+							"css:finder"
+						],
+						[
+							"xpath=//input[@id=':Ril56:']",
+							"xpath:attributes"
+						],
+						[
+							"xpath=//div[@id='__next']/nav/div/div[2]/div/input",
+							"xpath:idRelative"
+						],
+						[
+							"xpath=//input",
+							"xpath:position"
+						]
+					],
+					"value": "${KEY_ENTER}"
+				},
+				{
+					"id": "16ff7132-a7ef-4133-8891-4fd8db24bd49",
+					"comment": "",
+					"command": "assertElementPresent",
+					"target": "css=.MuiTypography-root",
+					"targets": [],
+					"value": ""
+				}
+			]
+		}
+	],
+	"suites": [
+		{
+			"id": "116e6d91-3b23-4b41-b2f8-f2f507bd7ac8",
+			"name": "Default Suite",
+			"persistSession": false,
+			"parallel": false,
+			"timeout": 300,
+			"tests": [
+				"075a20a6-479d-44d7-b566-426b6a8505d5"
+			]
+		}
+	],
+	"urls": [
+		"https://yticks.vercel.app/"
+	],
+	"plugins": []
 }
