@@ -22,6 +22,31 @@ describe("Validating the parsed results based on the type of the file uploaded",
 				".added-manually",
 			]);
 		});
+
+		test("Checking if the parser needs a patch for the names", function () {
+			expect(parser.needForPatch()).toBe(true);
+		});
+
+		test("Patching the Names", function () {
+			const locators = parser.locators;
+			locators["=Add/Remove Elements"] = "modifyElementButton";
+			locators["button"] = "normal_button";
+			locators[".added-manually"] = "addedManually";
+
+			expect(
+				parser.patchName("=Add/Remove Elements", "modifyElementButton")
+			).toBe(true);
+			expect(parser.patchName("button", "normal_button")).toBe(true);
+			expect(parser.patchName(".added-manually", "addedManually")).toBe(
+				true
+			);
+
+			expect(parser.func_names.has("normal_button")).toBe(true);
+			expect(parser.func_names.has("addedManually")).toBe(true);
+			expect(parser.func_names.has("modifyElementButton")).toBe(true);
+		});
+
+		test("After patching the names of the locators, we patch the whole script", function () {});
 	});
 
 	describe("file with some variable names", function () {
@@ -47,9 +72,29 @@ describe("Validating the parsed results based on the type of the file uploaded",
 			]);
 		});
 
-		test("Verifying the name of the locator collected from the script", function () {
+		test("Verifying if the parser is able to detect the names from the script", function () {
 			const given_name = locators["#:Ril56:"];
 			expect(given_name).toEqual("search_bar");
+		});
+
+		test("patching the variable names even those which are already defined", function () {
+			expect(parser.func_names.has("search_bar")).toBe(true);
+
+			expect(parser.patchName("#:Ril56:", "search_bar_location")).toBe(
+				true
+			);
+			expect(parser.patchName("#:Ril56:-label", "search_bar_label")).toBe(
+				true
+			);
+			expect(
+				parser.patchName(".MuiTypography-root", "confirm_button")
+			).toBe(true);
+
+			expect(parser.func_names.has("search_bar")).toBe(false);
+		});
+
+		test("Checking if the parser still needs a patch", function () {
+			expect(parser.needForPatch()).toBe(false);
 		});
 	});
 });

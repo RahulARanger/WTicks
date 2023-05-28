@@ -156,7 +156,7 @@ export function parseLocators(locator: string): LocationResult {
 
 		default:
 			console.info(
-				"Target is not a valid possibly the command doesn't require one, hence ignoring it"
+				`${location} - not saved as locator, as it is not one.`
 			);
 	}
 

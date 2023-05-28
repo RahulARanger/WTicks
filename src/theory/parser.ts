@@ -77,10 +77,23 @@ abstract class GeneralizeVariable {
 	}
 
 	needForPatch() {
-		return Object.keys(this.locators).every((key) => {
+		return !Object.keys(this.locators).every((key) => {
 			if (this.locators[key]) return true;
 			return false;
 		});
+	}
+
+	patchName(locator: string, name: string): boolean {
+		if (!this.test_var_name.test(name) && this.func_names.has(name))
+			return false;
+
+		if (this.locators[locator])
+			this.func_names.delete(this.locators[locator]);
+
+		this.locators[locator] = name;
+		this.func_names.add(name);
+
+		return true;
 	}
 
 	handleLocator(locator: string, var_name: string): LocationResult {
