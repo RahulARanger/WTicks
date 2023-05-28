@@ -1,6 +1,15 @@
 import { describe, expect, test } from "@jest/globals";
-import { parseLocators, mapSteps } from "../src/theory/stepMapping";
+import {
+	parseLocators,
+	mapSteps,
+	insideQuotes,
+} from "../src/theory/stepMapping";
 import { LocationResult, ParsedTestStep } from "../src/theory/sharedTypes";
+import {
+	dollar_method,
+	generateClass,
+	generateClassMethod,
+} from "../src/theory/scriptGenerators";
 
 interface ExpectedLocationResult {
 	input: string;
@@ -174,6 +183,15 @@ describe("Validating the step mappings", function () {
 			},
 			output: `console.log("Hello There");`,
 		},
+		{
+			input: {
+				isLocator: false,
+				command_name: "runScript",
+				target: "window.scrollTo(0,900)",
+				value: "",
+			},
+			output: `await browser.execute("window.scrollTo(0,900)");`,
+		},
 	];
 
 	test.each<ExpectedStepResult>(tests)(
@@ -183,3 +201,61 @@ describe("Validating the step mappings", function () {
 		}
 	);
 });
+
+describe("Verifying the inside quotes scripts", function () {
+	type testsType = [string | number, string | number];
+
+	const tests: Array<testsType> = [
+		["checking", `\"checking\"`],
+		[69, 69],
+		[6.6, 6.6],
+		["First Line\nSecond Line", `\"First Line\nSecond Line\"`],
+		["", '""'],
+		["This one is 'Single Quotes'", "\"This one is 'Single Quotes'\""],
+		[
+			"Then we have template quotes: `${some_var}`",
+			'"Then we have template quotes: `${some_var}`"',
+		],
+		['It has some "quotes"', '"It has some "quotes""'],
+	];
+
+	test.each<testsType>(tests)(
+		"Verifying the result inside the quotes scripts with input: %p",
+		function (input, output) {
+			expect(insideQuotes(input)).toBe(output);
+		}
+	);
+});
+
+describe("Verifying the locator class generated at the end", function () {
+	const create_form = generateClassMethod("createForm", "#create-form");
+	const input = generateClassMethod("input", "input");
+	const submit_button = generateClassMethod("submitForm", "#submit-form");
+	const locator_class = generateClass([create_form, input, submit_button]);
+
+	const expected = [
+		`\n\tget createForm() {\n\t\treturn $("#create-form");\n\t}`,
+		`\n\tget input() {\n\t\treturn $("input");\n\t}`,
+		`\n\tget submitForm() {\n\t\treturn $("#submit-form");\n\t}`,
+	];
+
+	test("Verifying the class method generated", function () {
+		expect(create_form).toBe(expected[0]);
+		expect(input).toBe(expected[1]);
+		expect(submit_button).toBe(expected[2]);
+	});
+
+	test("Verifying the class generated without the any variables requested to store", function () {
+		expect(locator_class).toBe(
+			`\nclass Locators {${dollar_method}${expected.join("")}\n};\n`
+		);
+	});
+});
+
+// describe("Verifying the script generated for the block of commands", function () {});
+
+// SCRIPT GENERATED at the end is of the types:
+
+// 1. META DATA
+// 2. Locators Class
+// 3. Block of commands

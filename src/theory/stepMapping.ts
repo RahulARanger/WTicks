@@ -8,6 +8,11 @@ function browserAssertion(isOpposite: boolean) {
 	return `await expect(browser).${oppPrefix(isOpposite)}`;
 }
 
+export function insideQuotes(value: any): any {
+	// if string then inside the quotes else it is not
+	return typeof value === "string" ? `\"${value}\"` : value;
+}
+
 export function mapSteps(
 	step: ParsedTestStep,
 	locator_name: string
@@ -48,11 +53,11 @@ export function mapSteps(
 			return template + "click();";
 		}
 		case "type": {
-			return template + `setValue("${step.value}");`;
+			return template + `setValue(${insideQuotes(step.value)});`;
 		}
 
 		case "open": {
-			return template + `browser.url("${step.target}");`;
+			return template + `browser.url(${insideQuotes(step.target)});`;
 		}
 
 		case "setWindowSize": {
@@ -63,10 +68,13 @@ export function mapSteps(
 		// assertions
 
 		case "assertText": {
-			return template + `.toHaveText("${step.value}")`;
+			return template + `.toHaveText(${insideQuotes(step.value)})`;
 		}
 		case "assertTitle": {
-			return browserAssertion(isOpposite) + `toHaveTitle(${step.value});`;
+			return (
+				browserAssertion(isOpposite) +
+				`toHaveTitle(${insideQuotes(step.value)});`
+			);
 		}
 
 		case "assertElementPresent": {
@@ -82,24 +90,24 @@ export function mapSteps(
 		}
 
 		case "assertText": {
-			return template + `toHaveText(${step.value});`;
+			return template + `toHaveText(${insideQuotes(step.value)});`;
 		}
 
 		case "assertValue": {
-			return template + `toHaveValue(${step.value});`;
+			return template + `toHaveValue(${insideQuotes(step.value)});`;
 		}
 
 		// browser actions
 		case "pause": {
-			return template + `browser.pause(${step.value});`;
+			return template + `browser.pause(${insideQuotes(step.value)});`;
 		}
 
-		case "executeScript": {
-			return template + `browser.execute(${step.value});`;
+		case "runScript": {
+			return template + `browser.execute(${insideQuotes(step.target)});`;
 		}
 
 		case "waitForVisible": {
-			return template + `waitForDisplayed(${step.value})`;
+			return template + `waitForDisplayed(${insideQuotes(step.value)})`;
 		}
 
 		case "debugger": {
