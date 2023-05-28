@@ -98,12 +98,7 @@ export default class UploadFile extends Component<
 									</>
 								)}
 								<Typography
-									variant={
-										this.state.isLoading &&
-										!this.state.error
-											? "subtitle2"
-											: "subtitle1"
-									}
+									variant={"subtitle1"}
 									sx={{ textAlign: "center" }}
 								>
 									{this.state.isLoading

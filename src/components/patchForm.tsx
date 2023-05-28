@@ -15,13 +15,14 @@ import ListItem from "@mui/material/ListItem";
 import formStyles from "@/styles/form.module.sass";
 import Drawer from "@mui/material/Drawer";
 import InputTextField from "./inputElement";
-import { Divider, TextField, Typography } from "@mui/material";
+import { Divider, Skeleton, TextField, Typography } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { ParsedTestCase, TestSuite } from "@/theory/sharedTypes";
 
 interface FormState {
 	index: number;
 	showPendingAlone: boolean;
+	locators: { [key: string]: string };
 }
 
 interface FormProps {
@@ -37,10 +38,20 @@ interface OptionType {
 }
 
 export class PatchForm extends Component<FormProps, FormState> {
-	state: FormState = { index: 0, showPendingAlone: false };
+	state: FormState = { index: 0, showPendingAlone: false, locators: {} };
 
 	parser() {
 		return this.props.parser;
+	}
+
+	componentDidUpdate(): void {
+		// we have to careful for not looping it infinitely
+		if (
+			Object.keys(this.props.parser.locators).length > 0 &&
+			Object.keys(this.state.locators).length === 0
+		) {
+			this.setState({ locators: { ...this.props.parser.locators } });
+		}
 	}
 
 	renderOptions() {
@@ -67,10 +78,22 @@ export class PatchForm extends Component<FormProps, FormState> {
 				groupBy={(option) =>
 					option.is_suite ? "Test Suites" : "Test Cases"
 				}
+				size={"small"}
 				getOptionLabel={(option) => option.label}
-				sx={{ width: 300 }}
+				sx={{ width: 300, mb: "10px" }}
 				renderInput={(params) => (
-					<InputTextField label="Export:" {...params} />
+					<InputTextField
+						label="Pick the Test case/suite to export"
+						placeholder="Not yet selected"
+						{...params}
+					/>
+				)}
+				PaperComponent={(props) => (
+					<Paper
+						{...props}
+						elevation={4}
+						sx={{ border: "1.5px solid black" }}
+					/>
 				)}
 			/>
 		);
@@ -100,8 +123,87 @@ export class PatchForm extends Component<FormProps, FormState> {
 		);
 	}
 
+	renderListItems() {
+		const locators = this.state.locators;
+
+		return (
+			<List className={formStyles.listContainer}>
+				{Object.keys(locators)
+					.filter((locator) =>
+						this.state.showPendingAlone ? !locators[locator] : true
+					)
+					.map((locator) => {
+						return (
+							<ListItem key={locator} disableGutters>
+								<InputTextField
+									label={locator}
+									defaultValue={locators[locator]}
+									required
+									placeholder="Not yet decided"
+									regexToMaintain={test_var_name}
+									sx={{ width: "100%" }}
+								/>
+							</ListItem>
+						);
+					})}
+			</List>
+		);
+	}
+
+	renderInputs() {
+		const locators = this.state.locators;
+		const savedLength = Object.keys(locators).length;
+		const fromInput = Object.keys(this.props.parser.locators).length;
+		const hasLocators = savedLength > 0;
+
+		return (
+			<>
+				{hasLocators ? (
+					this.renderListItems()
+				) : fromInput === savedLength ? (
+					<Typography
+						variant="h6"
+						color="paleturquoise"
+						alignItems="center"
+						flexGrow={1}
+						sx={{ display: "flex" }}
+						alignSelf="center"
+					>
+						No Locators found
+					</Typography>
+				) : (
+					<Skeleton
+						width="100%"
+						sx={{ flexGrow: 1 }}
+						component={"article"}
+					/>
+				)}
+				<Stack flexDirection="row" columnGap={"12px"}>
+					{hasLocators ? (
+						<Button
+							variant="outlined"
+							color="secondary"
+							onClick={this.verifySelection.bind(this)}
+						>
+							Verify
+						</Button>
+					) : (
+						<></>
+					)}
+					<Button
+						variant="outlined"
+						disabled={Object.values(locators).every(
+							(locator) => locator
+						)}
+					>
+						Generate
+					</Button>
+				</Stack>
+			</>
+		);
+	}
+
 	askForLocators() {
-		const locators = this.props.parser.locators;
 		return (
 			<FormControl className={formStyles.formBox}>
 				<>
@@ -125,39 +227,14 @@ export class PatchForm extends Component<FormProps, FormState> {
 							/>
 						}
 					/>
-					<List className={formStyles.listContainer}>
-						{Object.keys(locators)
-							.filter((locator) =>
-								this.state.showPendingAlone
-									? !locators[locator]
-									: true
-							)
-							.map((locator) => {
-								return (
-									<ListItem key={locator} disableGutters>
-										<InputTextField
-											label={locator}
-											defaultValue={locators[locator]}
-											required
-											regexToMaintain={test_var_name}
-											onConfirm={this.checkForInputTyped.bind(
-												this
-											)}
-											sx={{ width: "100%" }}
-										/>
-									</ListItem>
-								);
-							})}
-					</List>
-					<Button variant="outlined">Confirm</Button>
+					{this.renderInputs()}
 				</>
 			</FormControl>
 		);
 	}
 
-	checkForInputTyped(locator: string, textEntered: string): boolean {
-		// returns true if the input can be taken as variable name else false
-		return this.props.parser.patchName(locator, textEntered);
+	verifySelection() {
+		const locators = this.state.locators;
 	}
 
 	askForMethods() {
