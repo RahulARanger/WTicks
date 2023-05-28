@@ -11,6 +11,7 @@ import {
 import { generateClass, generateClassMethod } from "./scriptGenerators";
 import { mapSteps, parseLocators } from "./stepMapping";
 
+export const test_var_name = /^[a-zA-Z_$][a-zA-Z_$0-9]*$/;
 abstract class GeneralizeVariable {
 	testMap: { [key: string]: ParsedTestCase } = {};
 	parsed?: SideScript;
@@ -18,7 +19,6 @@ abstract class GeneralizeVariable {
 	locators: { [key: string]: string } = {};
 	func_names = new Set<string>();
 	store_things: { [key: string]: string | number } = {};
-	test_var_name = /^[a-zA-Z_$][a-zA-Z_$0-9]*$/;
 	dispatcher?: dispatcher;
 
 	abstract frameWorkType: string;
@@ -82,7 +82,7 @@ abstract class GeneralizeVariable {
 
 	patchName(locator: string, name: string): boolean {
 		// once if the names are patched then we would need patch the commands and hence the suite
-		if (!this.test_var_name.test(name) && this.func_names.has(name))
+		if (!test_var_name.test(name) && this.func_names.has(name))
 			return false;
 
 		if (this.locators[locator])
@@ -103,7 +103,7 @@ abstract class GeneralizeVariable {
 
 		let func_name = var_name;
 		const isUsed = this.func_names.has(func_name);
-		const isNotValid = !this.test_var_name.test(func_name);
+		const isNotValid = !test_var_name.test(func_name);
 
 		this.locators[location.target] =
 			isNotValid || isUsed
