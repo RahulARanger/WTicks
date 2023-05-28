@@ -1,6 +1,3 @@
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
 import { Component, RefObject, useRef, useState } from "react";
 import { ToStandaloneScript } from "@/theory/parser";
 import { alpha, styled } from "@mui/material/styles";
@@ -15,10 +12,17 @@ import FormHelperText from "@mui/material/FormHelperText";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import formStyles from "@/styles/form.module.sass";
+import Drawer from "@mui/material/Drawer";
 
 interface FormState {
 	index: number;
 	showPendingAlone: boolean;
+}
+
+interface FormProps {
+	parser: ToStandaloneScript;
+	showDrawer: boolean;
+	closeDrawer: () => void;
 }
 
 export const BootstrapInput = styled(TextField)(({ theme }) => ({
@@ -60,38 +64,29 @@ function AskVarName(props: {
 	return <BootstrapInput label={props.label} value={inputValue} required />;
 }
 
-export class PatchForm extends Component<
-	{ parser: ToStandaloneScript },
-	FormState
-> {
+export class PatchForm extends Component<FormProps, FormState> {
 	state: FormState = { index: 0, showPendingAlone: false };
-	formTimeline() {
-		return (
-			<Stepper activeStep={this.state.index}>
-				<Step sx={{ mr: "6px" }}>
-					<StepLabel>Locators</StepLabel>
-				</Step>
-				<Step>
-					<StepLabel>Methods</StepLabel>
-				</Step>
-			</Stepper>
-		);
-	}
 	render() {
 		return (
-			<Paper
-				sx={{
-					p: "6px",
-					display: "flex",
-					flexDirection: "column",
-					rowGap: "12px",
-				}}
+			<Drawer
+				anchor="left"
+				open={this.props.showDrawer}
+				onClose={this.props.closeDrawer}
 			>
-				{this.formTimeline()}
-				{this.state.index === 0
-					? this.askForLocators()
-					: this.askForMethods()}
-			</Paper>
+				<Paper
+					sx={{
+						p: "6px",
+						display: "flex",
+						flexDirection: "column",
+						rowGap: "12px",
+						height: "100%",
+					}}
+				>
+					{this.state.index === 0
+						? this.askForLocators()
+						: this.askForMethods()}
+				</Paper>
+			</Drawer>
 		);
 	}
 
@@ -140,7 +135,7 @@ export class PatchForm extends Component<
 								);
 							})}
 					</List>
-					<Button>Next</Button>
+					<Button>Confirm</Button>
 				</>
 			</FormControl>
 		);

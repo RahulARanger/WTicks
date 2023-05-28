@@ -7,12 +7,12 @@ import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import TimelineDot from "@mui/lab/TimelineDot";
 import { Component, ReactNode } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import PendingIcon from "@mui/icons-material/Pending";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import { ToStandaloneScript } from "@/theory/parser";
 import { ShareDetails } from "@/theory/sharedTypes";
 import ErrorIcon from "@mui/icons-material/Error";
+import { motion } from "framer-motion";
 
 interface Item {
 	title: string;
@@ -112,9 +112,13 @@ export class TimelineComponent extends Component<TimelineProps, TimelineItems> {
 
 	render() {
 		return (
-			<Timeline position="alternate">
-				{this.state.mainItems.map(this.renderTimelineItem.bind(this))}
-			</Timeline>
+			<motion.div layout style={{ minWidth: "300px" }}>
+				<Timeline position="alternate">
+					{this.state.mainItems.map(
+						this.renderTimelineItem.bind(this)
+					)}
+				</Timeline>
+			</motion.div>
 		);
 	}
 

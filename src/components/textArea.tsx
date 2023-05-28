@@ -1,6 +1,6 @@
 import { Component, ReactNode } from "react";
 import Paper from "@mui/material/Paper";
-import { highlight, languages } from "prismjs";
+import { Grammar, highlight } from "prismjs";
 import "prismjs/themes/prism-tomorrow.css"; // Import the desired Prism theme CSS file
 import "prismjs/components/prism-javascript";
 import textAreaStyles from "@/styles/textArea.module.sass";
@@ -9,6 +9,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import "prismjs/components/prism-json";
 
 interface LineNumberState {
 	copied: boolean;
@@ -16,6 +17,8 @@ interface LineNumberState {
 
 interface LineNumberProps {
 	script: string;
+	language: Grammar;
+	languageString: string;
 }
 
 export default class SimpleScriptViewer extends Component<
@@ -59,9 +62,6 @@ export default class SimpleScriptViewer extends Component<
 						alignItems="center"
 						sx={{ width: "100%" }}
 					>
-						<Typography variant="subtitle1">
-							Generated Script
-						</Typography>
 						<Stack flexDirection="row">
 							<IconButton onClick={this.copyScript.bind(this)}>
 								<ContentCopyIcon />
@@ -79,11 +79,11 @@ export default class SimpleScriptViewer extends Component<
 						dangerouslySetInnerHTML={{
 							__html: highlight(
 								this.props.script,
-								languages.javascript,
-								"javascript"
+								this.props.language,
+								this.props.languageString
 							),
 						}}
-						className="language-javascript line-numbers"
+						className={`language-${this.props.languageString} line-numbers`}
 					></code>
 				</pre>
 				<Snackbar

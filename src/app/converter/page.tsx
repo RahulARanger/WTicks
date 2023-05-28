@@ -12,12 +12,19 @@ import SimpleScriptViewer from "@/components/textArea";
 import uploadFileStyles from "@/styles/uploadFile.module.sass";
 import { TimelineComponent } from "@/components/timeline";
 import { PatchForm } from "@/components/patchForm";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import TabContext from "@mui/lab/TabContext";
+import TabList from "@mui/lab/TabList";
+import TabPanel from "@mui/lab/TabPanel";
+import { languages } from "prismjs";
+import editorTabStyles from "@/styles/textArea.module.sass";
 
 export default class StandaloneScript extends Component<
 	StandAloneScriptProps,
 	StandAloneScriptState
 > {
-	state: StandAloneScriptState = {};
+	state: StandAloneScriptState = { viewerIndex: "0", showDrawer: true };
 
 	async parseRaw(data: string) {
 		const parser = new ToStandaloneScript();
@@ -54,6 +61,7 @@ export default class StandaloneScript extends Component<
 						}}
 					>
 						{this.renderForPatching()}
+						{this.showFiles()}
 						{this.renderStepsDone()}
 					</Stack>
 				</Stack>
@@ -61,15 +69,73 @@ export default class StandaloneScript extends Component<
 		);
 	}
 
-	renderForPatching(): ReactNode {
-		if (!this.state.scriptParser) return <></>;
-		if (this.state.patched) return this.renderAfterParsed();
-		if (!this.state.needPatch) return <></>;
-		return <PatchForm parser={this.state.scriptParser} />;
+	toggleDrawer(force?: boolean) {
+		const drawerState = this.state.needPatch
+			? true
+			: force
+			? true
+			: !this.state.showDrawer;
+		this.setState({ showDrawer: drawerState });
 	}
 
-	renderAfterParsed(): ReactNode {
-		return <></>;
+	renderForPatching(): ReactNode {
+		if (!this.state.scriptParser) return <></>;
+		return (
+			<PatchForm
+				parser={this.state.scriptParser}
+				closeDrawer={this.toggleDrawer.bind(this)}
+				showDrawer={this.state.showDrawer}
+			/>
+		);
+	}
+
+	shiftTab() {
+		this.setState({
+			viewerIndex: this.state.viewerIndex === "0" ? "1" : "0",
+		});
+	}
+
+	showFiles(): ReactNode {
+		const nameOfScript =
+			(this.state.scriptParser?.parsed?.name || "*?") + ".spec.js";
+		return (
+			<Box
+				sx={{ width: "100%", typography: "body1" }}
+				className={editorTabStyles.tabView}
+			>
+				<TabContext value={this.state.viewerIndex}>
+					<Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+						<TabList
+							onChange={this.shiftTab.bind(this)}
+							aria-label="notepad for the reference scripts"
+						>
+							<Tab label=".side" value="0" />
+							<Tab label={nameOfScript} value="1" disabled />
+						</TabList>
+					</Box>
+					<TabPanel value="0" className={editorTabStyles.editorTab}>
+						<SimpleScriptViewer
+							language={languages.json}
+							languageString="json"
+							script={
+								JSON.stringify(
+									this.state.scriptParser?.parsed,
+									null,
+									4
+								) || "{}"
+							}
+						/>
+					</TabPanel>
+					<TabPanel value="1" className={editorTabStyles.editorTab}>
+						<SimpleScriptViewer
+							language={languages.javascript}
+							languageString="javascript"
+							script={"{}"}
+						/>
+					</TabPanel>
+				</TabContext>
+			</Box>
+		);
 	}
 
 	renderStepsDone(): ReactNode {
