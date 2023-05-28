@@ -3,6 +3,9 @@ import { readMockData } from "./mockFileRead";
 import { ToStandaloneScript } from "../src/theory/parser";
 
 describe("Validating the parsed results based on the type of the file uploaded", function () {
+	const test_for_test_case = "230fa3c9-362e-4173-8ead-66c052dc68d9";
+	const test_for_test_suite = "90f25091-d413-472f-9e66-35569716293b";
+
 	describe("Validating the Script with valid test cases", function () {
 		const parser = new ToStandaloneScript();
 		parser.feed(readMockData("Adding&RemovingElements.side"));
@@ -46,7 +49,59 @@ describe("Validating the parsed results based on the type of the file uploaded",
 			expect(parser.func_names.has("modifyElementButton")).toBe(true);
 		});
 
-		test("After patching the names of the locators, we patch the whole script", function () {});
+		test("Now we parse the required suite", function () {
+			expect(parser.parseSuite(test_for_test_suite)).toBe(
+				"Assertion for Adding and Removing the Elements"
+			);
+		});
+
+		test("While the suite is parsed, the commands are mapped", function () {
+			const test_case = parser.parsedTestCases[test_for_test_case];
+			expect(test_case).not.toBeUndefined();
+			const parsed_steps: Array<string> = [];
+
+			test_case.commands.forEach((command) => {
+				expect(command.parsed).not.toBe(false);
+				expect(typeof command.parsed).toBe("string");
+				if (typeof command.parsed === "string")
+					parsed_steps.push(command.parsed);
+			});
+
+			const [open_command, setWindowSize, click] = [...parsed_steps];
+			expect(open_command).toBe(
+				`await browser.url("https://the-internet.herokuapp.com/");`
+			);
+			expect(setWindowSize).toBe(
+				"await browser.setWindowSize(1296, 736);"
+			);
+			expect(click).toBe("await pageClass.modifyElementButton.click();");
+		});
+
+		test("if the variables is renamed then we would need to parse suite again", function () {
+			expect(
+				parser.patchName(
+					"=Add/Remove Elements",
+					"AddOrRemoveElementButton"
+				)
+			).toBe(true);
+			expect(parser.func_names.has("modifyElementButton")).toBe(false);
+			const test_case = parser.parsedTestCases[test_for_test_case];
+
+			const click_command = test_case?.commands?.at(-1);
+			expect(click_command?.parsed).not.toBe(
+				"await pageClass.AddOrRemoveElementButton.click();"
+			);
+		});
+
+		test("while the suite is parsed, it will patch all the required commands", function () {
+			expect(parser.parseSuite(test_for_test_suite)).toBe(
+				"Assertion for Adding and Removing the Elements"
+			);
+			const test_case = parser.parsedTestCases[test_for_test_case];
+			expect(test_case?.commands?.at(-1)?.parsed).toBe(
+				"await pageClass.AddOrRemoveElementButton.click();"
+			);
+		});
 	});
 
 	describe("file with some variable names", function () {

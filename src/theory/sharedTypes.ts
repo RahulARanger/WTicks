@@ -7,11 +7,6 @@ export interface TestSuite {
 	tests: Array<string>;
 }
 
-export interface ParsedSuite {
-	steps: Array<string>;
-	name: string;
-}
-
 export interface Command {
 	id: string;
 	comment: string;

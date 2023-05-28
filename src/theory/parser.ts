@@ -1,7 +1,6 @@
 import {
 	TestSuite,
 	Test,
-	ParsedSuite,
 	ParsedTestCase,
 	ParsedTestStep,
 	Command,
@@ -20,7 +19,6 @@ abstract class GeneralizeVariable {
 	func_names = new Set<string>();
 	store_things: { [key: string]: string | number } = {};
 	test_var_name = /^[a-zA-Z_$][a-zA-Z_$0-9]*$/;
-	parsedSuites: Array<ParsedSuite> = [];
 	dispatcher?: dispatcher;
 
 	abstract frameWorkType: string;
@@ -66,7 +64,6 @@ abstract class GeneralizeVariable {
 			const test_case = this.parsedTestCases[test_id];
 			if (!test_case) return;
 			test_case.commands = test_case.commands.map((step) => {
-				if (step.parsed) return step;
 				const text = mapSteps(step, this.locators[step.target]);
 				return {
 					...step,
@@ -84,6 +81,7 @@ abstract class GeneralizeVariable {
 	}
 
 	patchName(locator: string, name: string): boolean {
+		// once if the names are patched then we would need patch the commands and hence the suite
 		if (!this.test_var_name.test(name) && this.func_names.has(name))
 			return false;
 
@@ -140,23 +138,17 @@ abstract class GeneralizeVariable {
 		return commands.length > 0;
 	}
 
-	parseSuite(suite: TestSuite): boolean {
+	parseSuite(suite_id: string): void | string {
 		// assuming test cases were already parsed
-		const testSteps: Array<string> = [];
+		if (!this.parsed?.suites) return;
 
-		suite.tests.forEach((testID) => {
-			const testCase = this.parsedTestCases[testID]; // testID are not manually written so please do not manipulate this
-			if (!testCase) return false;
-			testSteps.push(testCase.step_name);
-		});
+		const suite = this.parsed?.suites.find(
+			(suite) => suite_id === suite.id
+		);
 
-		if (testSteps.length > 0)
-			this.parsedSuites.push({
-				name: suite.name,
-				steps: testSteps,
-			});
-
-		return testSteps.length > 0;
+		if (!suite) return;
+		this.patchCommands(...suite.tests);
+		return suite.name;
 	}
 
 	parseTestCases() {
@@ -203,6 +195,18 @@ export abstract class Listener extends GeneralizeVariable {
 
 		return result;
 	}
+
+	parseSuite(suite_id: string): string | void {
+		const result = super.parseSuite(suite_id);
+
+		if (result)
+			this.dispatcher &&
+				this.dispatcher({
+					type: "parsedSuite",
+					result,
+				});
+		return result;
+	}
 }
 
 export class ToStandaloneScript extends Listener {
@@ -225,30 +229,6 @@ const browser = await remote({
 			`import {$} from "@wdio/globals";`,
 			browser_options,
 			this.generateLocatorClass(),
-		].join("");
-	}
-}
-
-export default class ToGherkin extends GeneralizeVariable {
-	frameWorkType: string = "Gherkin";
-	check = /^(Given|When|Then|And|But) .+$/;
-
-	genScenario(scenario: ParsedSuite): string {
-		return [
-			"\t",
-			"Scenario: ",
-			scenario.name,
-			...scenario.steps.map((step) => `\n\t\t${step}`),
-			"\n",
-		].join("");
-	}
-
-	generateGherkinFile(): string {
-		return [
-			"Feature: ",
-			this.parsed?.name,
-			"\n",
-			this.parsedSuites.map(this.genScenario.bind(this)),
 		].join("");
 	}
 }
