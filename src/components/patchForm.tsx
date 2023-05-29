@@ -15,14 +15,24 @@ import ListItem from "@mui/material/ListItem";
 import formStyles from "@/styles/form.module.sass";
 import Drawer from "@mui/material/Drawer";
 import InputTextField from "./inputElement";
-import { Divider, Skeleton, TextField, Typography } from "@mui/material";
+import {
+	Divider,
+	Skeleton,
+	TextField,
+	Tooltip,
+	Typography,
+} from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { ParsedTestCase, TestSuite } from "@/theory/sharedTypes";
 
 interface FormState {
 	index: number;
 	showPendingAlone: boolean;
-	locators: { [key: string]: string };
+	locators: { [key: string]: RefObject<HTMLInputElement> };
+	goodToGenerate: boolean;
+	error?: string;
+	isTestCaseSelected?: boolean;
+	selectedOption?: string;
 }
 
 interface FormProps {
@@ -38,20 +48,23 @@ interface OptionType {
 }
 
 export class PatchForm extends Component<FormProps, FormState> {
-	state: FormState = { index: 0, showPendingAlone: false, locators: {} };
+	state: FormState = {
+		index: 0,
+		showPendingAlone: false,
+		locators: {},
+		goodToGenerate: false,
+		error: "Please select the test case",
+	};
+
+	constructor(props: FormProps) {
+		super(props);
+		for (let locator of Object.keys(props.parser.locators)) {
+			this.state.locators[locator] = createRef<HTMLInputElement>();
+		}
+	}
 
 	parser() {
 		return this.props.parser;
-	}
-
-	componentDidUpdate(): void {
-		// we have to careful for not looping it infinitely
-		if (
-			Object.keys(this.props.parser.locators).length > 0 &&
-			Object.keys(this.state.locators).length === 0
-		) {
-			this.setState({ locators: { ...this.props.parser.locators } });
-		}
 	}
 
 	renderOptions() {
@@ -124,13 +137,15 @@ export class PatchForm extends Component<FormProps, FormState> {
 	}
 
 	renderListItems() {
-		const locators = this.state.locators;
+		const locators = this.props.parser.locators;
 
 		return (
 			<List className={formStyles.listContainer}>
 				{Object.keys(locators)
 					.filter((locator) =>
-						this.state.showPendingAlone ? !locators[locator] : true
+						this.state.showPendingAlone
+							? !this.state.locators[locator].current
+							: true
 					)
 					.map((locator) => {
 						return (
@@ -142,6 +157,10 @@ export class PatchForm extends Component<FormProps, FormState> {
 									placeholder="Not yet decided"
 									regexToMaintain={test_var_name}
 									sx={{ width: "100%" }}
+									inputRef={this.state.locators[locator]}
+									afterValidation={this.resetGenerate.bind(
+										this
+									)}
 								/>
 							</ListItem>
 						);
@@ -150,17 +169,32 @@ export class PatchForm extends Component<FormProps, FormState> {
 		);
 	}
 
+	resetGenerate(text: string, locator: string, isError: boolean) {
+		if (!this.state.goodToGenerate) return;
+
+		const same = this.props.parser.locators[locator] === text;
+		const so = isError ? false : same;
+
+		this.setState({
+			goodToGenerate: so,
+			error: so
+				? undefined
+				: isError
+				? "Error found in one of the input"
+				: "Please verify before generating it",
+		});
+	}
+
 	renderInputs() {
-		const locators = this.state.locators;
+		const locators = this.props.parser.locators;
 		const savedLength = Object.keys(locators).length;
-		const fromInput = Object.keys(this.props.parser.locators).length;
 		const hasLocators = savedLength > 0;
 
 		return (
 			<>
 				{hasLocators ? (
 					this.renderListItems()
-				) : fromInput === savedLength ? (
+				) : (
 					<Typography
 						variant="h6"
 						color="paleturquoise"
@@ -171,12 +205,6 @@ export class PatchForm extends Component<FormProps, FormState> {
 					>
 						No Locators found
 					</Typography>
-				) : (
-					<Skeleton
-						width="100%"
-						sx={{ flexGrow: 1 }}
-						component={"article"}
-					/>
 				)}
 				<Stack flexDirection="row" columnGap={"12px"}>
 					{hasLocators ? (
@@ -190,14 +218,16 @@ export class PatchForm extends Component<FormProps, FormState> {
 					) : (
 						<></>
 					)}
-					<Button
-						variant="outlined"
-						disabled={Object.values(locators).every(
-							(locator) => locator
-						)}
-					>
-						Generate
-					</Button>
+					<Tooltip title={this.state.error || "Generate Script"}>
+						<span>
+							<Button
+								variant="outlined"
+								disabled={!this.state.goodToGenerate}
+							>
+								Generate
+							</Button>
+						</span>
+					</Tooltip>
 				</Stack>
 			</>
 		);
@@ -207,7 +237,10 @@ export class PatchForm extends Component<FormProps, FormState> {
 		return (
 			<FormControl className={formStyles.formBox}>
 				<>
-					<Typography variant="subtitle1" sx={{ mb: "12px" }}>
+					<Typography
+						variant="subtitle1"
+						sx={{ mb: "12px", alignSelf: "stretch" }}
+					>
 						Please fill the names of the locators.
 						<Divider variant="fullWidth" />
 					</Typography>
@@ -235,6 +268,27 @@ export class PatchForm extends Component<FormProps, FormState> {
 
 	verifySelection() {
 		const locators = this.state.locators;
+		const namesRequested = new Set();
+		let isThereUnfilled = false;
+		let isThereDuplicate = false;
+
+		for (let locator of Object.keys(locators)) {
+			const input = locators[locator].current;
+			if (!input) continue;
+			const request = input.value;
+			if (namesRequested.has(request)) {
+				isThereDuplicate = true;
+				break;
+			}
+			namesRequested.add(input.value);
+		}
+
+		this.setState({
+			goodToGenerate: !isThereDuplicate,
+			error: isThereDuplicate
+				? "Please ensure we do not use duplicate names"
+				: "",
+		});
 	}
 
 	askForMethods() {

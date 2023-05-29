@@ -151,5 +151,10 @@ describe("Validating the parsed results based on the type of the file uploaded",
 		test("Checking if the parser still needs a patch", function () {
 			expect(parser.needForPatch()).toBe(false);
 		});
+
+		test("Verifying the script generated at the end", function () {
+			const scriptGenerated = parser.genScript;
+			expect(scriptGenerated).toBe("");
+		});
 	});
 });

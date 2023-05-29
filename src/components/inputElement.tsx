@@ -5,11 +5,11 @@ import { OutlinedInputProps } from "@mui/material/OutlinedInput";
 
 interface InputTextFieldProps {
 	regexToMaintain?: RegExp;
+	afterValidation?: (value: string, label: string, isValid: boolean) => void;
 }
 
 interface TextFieldState {
 	error?: boolean;
-	value: string;
 }
 
 export const CustomizedTextField = styled((props: TextFieldProps) => (
@@ -44,12 +44,15 @@ export default class InputTextField extends Component<
 	InputTextFieldProps & TextFieldProps,
 	TextFieldState
 > {
-	state: TextFieldState = { value: "" };
+	state: TextFieldState = {};
 
 	handleValidation(event: ChangeEvent<HTMLInputElement>): void {
 		if (!this.props.regexToMaintain) return;
 		const text = event.target.value;
-		this.setState({ error: !this.props.regexToMaintain?.test(text) });
+		const isError = !this.props.regexToMaintain?.test(text);
+		this.setState({ error: isError });
+		if (this.props.afterValidation)
+			this.props.afterValidation(text, String(this.props.label), isError);
 	}
 
 	render() {
@@ -57,17 +60,18 @@ export default class InputTextField extends Component<
 			<CustomizedTextField
 				error={this.state.error || false}
 				{...this.props}
-				helperText={
-					this.state.error && this.props.regexToMaintain
-						? `Required: ${this.props.regexToMaintain}`
-						: undefined
-				}
 				onChange={
 					this.props.regexToMaintain
 						? this.handleValidation.bind(this)
 						: undefined
 				}
 				variant="filled"
+				helperText={
+					this.props.helperText ||
+					(this.state.error && this.props.regexToMaintain
+						? `Required: ${this.props.regexToMaintain}`
+						: undefined)
+				}
 			/>
 		);
 	}

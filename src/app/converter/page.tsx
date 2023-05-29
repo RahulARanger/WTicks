@@ -79,14 +79,18 @@ export default class StandaloneScript extends Component<
 	}
 
 	renderForPatching(): ReactNode {
-		if (!this.state.scriptParser) return <></>;
-		return (
-			<PatchForm
-				parser={this.state.scriptParser}
-				closeDrawer={this.toggleDrawer.bind(this)}
-				showDrawer={this.state.showDrawer}
-			/>
-		);
+		if (
+			this.state.scriptParser &&
+			(this.state.patched || this.state.needPatch)
+		)
+			return (
+				<PatchForm
+					parser={this.state.scriptParser}
+					closeDrawer={this.toggleDrawer.bind(this)}
+					showDrawer={this.state.showDrawer}
+				/>
+			);
+		return <></>;
 	}
 
 	shiftTab() {

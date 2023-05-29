@@ -8,7 +8,13 @@ import {
 	LocationResult,
 	dispatcher,
 } from "./sharedTypes";
-import { generateClass, generateClassMethod } from "./scriptGenerators";
+import {
+	generateClass,
+	generateClassMethod,
+	generate_async_func,
+	generating_caller_iife,
+	to_good_name,
+} from "./scriptGenerators";
 import { mapSteps, parseLocators } from "./stepMapping";
 
 export const test_var_name = /^[a-zA-Z_$][a-zA-Z_$0-9]*$/;
@@ -43,7 +49,7 @@ abstract class GeneralizeVariable {
 		if (name === false) return "";
 
 		// if the name given by the user is not valid then we replace the spaces or small things with _
-		const purified = name.replaceAll("^[^a-zA-Z_$]|[^0-9a-zA-Z_$]", "_");
+		const purified = to_good_name(name);
 		if (this.func_names.has(purified)) return this.generate_name(false);
 		return purified;
 	}
@@ -122,7 +128,7 @@ abstract class GeneralizeVariable {
 		};
 	}
 
-	parseTestCase(testCase: Test): boolean {
+	parseTestCase(testCase: Test) {
 		const commands = [];
 		for (let command of testCase.commands) {
 			const result = this.parseTestStep(command);
@@ -134,8 +140,6 @@ abstract class GeneralizeVariable {
 			commands,
 			id: testCase.id, // required for test case organization in suites
 		};
-
-		return commands.length > 0;
 	}
 
 	parseSuite(suite_id: string): void | string {
@@ -153,7 +157,7 @@ abstract class GeneralizeVariable {
 
 	parseTestCases() {
 		const tests = this.parsed?.tests || [];
-		return tests.every(this.parseTestCase.bind(this));
+		tests.forEach(this.parseTestCase.bind(this));
 	}
 
 	hasTests(suite: TestSuite): boolean {
@@ -174,45 +178,33 @@ abstract class GeneralizeVariable {
 }
 
 export abstract class Listener extends GeneralizeVariable {
-	parseTestCase(testCase: Test): boolean {
-		const result = super.parseTestCase(testCase);
-		if (!result)
-			this.dispatcher &&
-				this.dispatcher({
-					type: "parsedTestCase",
-					result: testCase.name,
-				});
-		return result;
-	}
-
-	parseTestCases(): boolean {
-		const result = super.parseTestCases();
+	parseTestCase(testCase: Test) {
+		super.parseTestCase(testCase);
 		this.dispatcher &&
 			this.dispatcher({
-				type: "parsedTestCases",
-				result: result,
+				type: "parsedTestCase",
+				result: testCase.name,
 			});
-
-		return result;
-	}
-
-	parseSuite(suite_id: string): string | void {
-		const result = super.parseSuite(suite_id);
-
-		if (result)
-			this.dispatcher &&
-				this.dispatcher({
-					type: "parsedSuite",
-					result,
-				});
-		return result;
 	}
 }
 
 export class ToStandaloneScript extends Listener {
 	frameWorkType: string = "Standalone";
 
-	genScript(): string {
+	genScript(...test_case_ids: string[]): string {
+		const func_names: string[] = [];
+
+		const tests = test_case_ids.map((test_case_id) => {
+			const test = this.parsedTestCases[test_case_id];
+			const func_name = to_good_name(test.step_name);
+			func_names.push(func_name);
+
+			return generate_async_func(
+				func_name,
+				test.commands.map((command) => `\t${command.parsed}`).join("\n")
+			);
+		});
+
 		const browser_options = `
 // if you are using browser runner to execute the scripts then you can ignore the below configuration for the browser
 const browser = await remote({
@@ -229,6 +221,9 @@ const browser = await remote({
 			`import {$} from "@wdio/globals";`,
 			browser_options,
 			this.generateLocatorClass(),
-		].join("");
+			"const pageClass = new Locators()",
+			...tests,
+			generating_caller_iife(func_names),
+		].join("\n");
 	}
 }

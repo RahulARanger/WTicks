@@ -34,6 +34,17 @@ const browser = await remote({
 // commands specific to the test suite starts now
 `;
 
-export function generateRunnerScript() {
-	return;
+export function to_good_name(name: string): string {
+	return name.replaceAll("^[^a-zA-Z_$]|[^0-9a-zA-Z_$]", "_");
+}
+
+export function generate_async_func(name: string, commands: string): string {
+	return `async function ${name}() {\n${commands}\n}`;
+}
+
+// Generating Immediately Invoked Function Expression (IIFE)
+export function generating_caller_iife(func_names_to_call: string[]): string {
+	return `; (async () => {\n${func_names_to_call
+		.map((_name) => `\t${_name}();`)
+		.join("\n")}\n})();`;
 }
