@@ -7,35 +7,43 @@ export function generateClassMethod(
 		method_name,
 		"() {\n",
 		"\t\treturn ",
-		`$("${locator_path}");`,
+		`this.$("${locator_path}");`,
 		"\n\t}",
 	].join("");
 }
 
 export const dollar_method =
-	"\n\tfunction $(location) {\n\t\treturn browser.$(location);\n\t}";
+	"\n\t$(location) {\n\t\treturn browser.$(location);\n\t}";
 
 export function generateClass(methods: Array<string>): string {
 	if (!methods.length) return "";
 	return ["\nclass Locators {", dollar_method, ...methods, "\n};\n"].join("");
 }
 
-export const start_of_script = `import { remote, Key } from "webdriverio";
-import { expect } from "expect-webdriverio";
+export const imports_required = [
+	'import { remote } from "webdriverio";',
+	'import { expect } from "expect-webdriverio";',
+].join("\n");
 
+export const browser_options = `
+// if you are using browser runner to execute the scripts then you can ignore the below configuration for the browser
 const browser = await remote({
-    capabilities: {
-        browserName: 'chrome',
-        'goog:chromeOptions': {
-            args: process.env.CI ? ['headless', 'disable-gpu'] : []
-        }
-    }
-})
-// commands specific to the test suite starts now
-`;
+	capabilities: {
+		browserName: 'chrome',
+		'goog:chromeOptions': {
+			args: process.env.CI ? ['headless', 'disable-gpu'] : []
+		}
+	}
+});`;
 
 export function to_good_name(name: string): string {
-	return name.replaceAll("^[^a-zA-Z_$]|[^0-9a-zA-Z_$]", "_");
+	let trimmed_name = name.trim().replace(/[^a-zA-Z0-9]/g, "_");
+
+	// If the string starts with a digit or is an empty string, add a prefix
+	if (/^[0-9]/.test(trimmed_name) || trimmed_name === "")
+		trimmed_name = `_${trimmed_name}`;
+
+	return trimmed_name;
 }
 
 export function generate_async_func(name: string, commands: string): string {

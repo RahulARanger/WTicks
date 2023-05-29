@@ -9,10 +9,12 @@ import {
 	dispatcher,
 } from "./sharedTypes";
 import {
+	browser_options,
 	generateClass,
 	generateClassMethod,
 	generate_async_func,
 	generating_caller_iife,
+	imports_required,
 	to_good_name,
 } from "./scriptGenerators";
 import { mapSteps, parseLocators } from "./stepMapping";
@@ -65,8 +67,9 @@ abstract class GeneralizeVariable {
 		);
 	}
 
-	patchCommands(...test_ids: Array<string>) {
-		test_ids.forEach((test_id) => {
+	patchCommands(...test_ids: Array<string>): Set<string> {
+		const ids = new Set(test_ids);
+		ids.forEach((test_id) => {
 			const test_case = this.parsedTestCases[test_id];
 			if (!test_case) return;
 			test_case.commands = test_case.commands.map((step) => {
@@ -77,6 +80,7 @@ abstract class GeneralizeVariable {
 				};
 			});
 		});
+		return ids;
 	}
 
 	needForPatch() {
@@ -132,6 +136,13 @@ abstract class GeneralizeVariable {
 		const commands = [];
 		for (let command of testCase.commands) {
 			const result = this.parseTestStep(command);
+			if (result && result.isLocator) {
+				command.target = result.target = result.target.replaceAll(
+					":",
+					"\\\\:"
+				); // https://stackoverflow.com/a/3544927/12318454
+			}
+
 			if (result) commands.push(result);
 		}
 
@@ -160,20 +171,8 @@ abstract class GeneralizeVariable {
 		tests.forEach(this.parseTestCase.bind(this));
 	}
 
-	hasTests(suite: TestSuite): boolean {
-		return suite.tests.length > 0;
-	}
-
-	hasSuites(): boolean {
-		return this.parsed?.suites.some(this.hasTests.bind(this)) || false;
-	}
-
 	isValidFile(): boolean {
-		return (
-			this.hasSuites() &&
-			Boolean(this.parsed?.name) &&
-			this.parsed?.version === "2.0"
-		);
+		return Boolean(this.parsed?.name) && this.parsed?.version === "2.0";
 	}
 }
 
@@ -196,7 +195,7 @@ export class ToStandaloneScript extends Listener {
 
 		const tests = test_case_ids.map((test_case_id) => {
 			const test = this.parsedTestCases[test_case_id];
-			const func_name = to_good_name(test.step_name);
+			const func_name = to_good_name(test.step_name.toLowerCase());
 			func_names.push(func_name);
 
 			return generate_async_func(
@@ -205,25 +204,13 @@ export class ToStandaloneScript extends Listener {
 			);
 		});
 
-		const browser_options = `
-// if you are using browser runner to execute the scripts then you can ignore the below configuration for the browser
-const browser = await remote({
-	capabilities: {
-		browserName: 'chrome',
-		'goog:chromeOptions': {
-			args: process.env.CI ? ['headless', 'disable-gpu'] : []
-		}
-	}
-});
-`;
 		return [
-			`import { remote } from 'webdriverio';`,
-			`import {$} from "@wdio/globals";`,
+			imports_required,
 			browser_options,
 			this.generateLocatorClass(),
-			"const pageClass = new Locators()",
+			"const pageClass = new Locators();",
 			...tests,
 			generating_caller_iife(func_names),
-		].join("\n");
+		].join("\n\n");
 	}
 }

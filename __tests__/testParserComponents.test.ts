@@ -3,12 +3,14 @@ import {
 	parseLocators,
 	mapSteps,
 	insideQuotes,
+	transitions,
 } from "../src/theory/stepMapping";
 import { LocationResult, ParsedTestStep } from "../src/theory/sharedTypes";
 import {
 	dollar_method,
 	generateClass,
 	generateClassMethod,
+	to_good_name,
 } from "../src/theory/scriptGenerators";
 
 interface ExpectedLocationResult {
@@ -81,6 +83,40 @@ interface ExpectedStepResult {
 	output: boolean | string;
 }
 
+describe("Verifying the helper functions for step mapping", function () {
+	const verifyTests = [
+		["verifyElementPresent", "assertElementPresent"],
+		["verifyElementNotPresent", "assertElementNotPresent"],
+		["verifyChecked", "assertChecked"],
+		["verifyEditable", "assertEditable"],
+		["verifyNotSelectedValue", "assertNotSelectedValue"],
+	];
+
+	test.each(verifyTests)(
+		"Verifying the mapping for the verify- related steps to assert with input $input",
+		function (input, output) {
+			expect(transitions(input)).toBe(output);
+		}
+	);
+
+	const verifyNames = [
+		["verifyingTheName", "verifyingTheName"],
+		["", "_"],
+		["#@$#$", "_____"],
+		["_$_", "___"],
+		["first word", "first_word"],
+		["0thTest", "_0thTest"],
+		["0.69", "_0_69"],
+	];
+
+	test.each(verifyNames)(
+		"Verifying the conversion of input to suitable name for js's variables / functions; $input",
+		function (input, output) {
+			expect(to_good_name(input)).toBe(output);
+		}
+	);
+});
+
 describe("Validating the step mappings", function () {
 	const locator_name = "locator_name";
 	const tests: Array<ExpectedStepResult> = [
@@ -118,7 +154,7 @@ describe("Validating the step mappings", function () {
 				command_name: "assertElementPresent",
 				value: "true",
 			},
-			output: "await expect(pageClass.locator_name).toBeDisplayed();",
+			output: "await expect(pageClass.locator_name).toBePresent();",
 		},
 		{
 			input: {
@@ -192,6 +228,24 @@ describe("Validating the step mappings", function () {
 			},
 			output: `await browser.execute("window.scrollTo(0,900)");`,
 		},
+		{
+			input: {
+				isLocator: true,
+				command_name: "verifyElementPresent",
+				target: "input#search",
+				value: "",
+			},
+			output: "await expect(pageClass.locator_name).toBePresent();",
+		},
+		{
+			input: {
+				isLocator: true,
+				command_name: "verifyElementNotPresent",
+				target: "input#search",
+				value: "",
+			},
+			output: "await expect(pageClass.locator_name).not.toBePresent();",
+		},
 	];
 
 	test.each<ExpectedStepResult>(tests)(
@@ -234,9 +288,9 @@ describe("Verifying the locator class generated at the end", function () {
 	const locator_class = generateClass([create_form, input, submit_button]);
 
 	const expected = [
-		`\n\tget createForm() {\n\t\treturn $("#create-form");\n\t}`,
-		`\n\tget input() {\n\t\treturn $("input");\n\t}`,
-		`\n\tget submitForm() {\n\t\treturn $("#submit-form");\n\t}`,
+		`\n\tget createForm() {\n\t\treturn this.$("#create-form");\n\t}`,
+		`\n\tget input() {\n\t\treturn this.$("input");\n\t}`,
+		`\n\tget submitForm() {\n\t\treturn this.$("#submit-form");\n\t}`,
 	];
 
 	test("Verifying the class method generated", function () {

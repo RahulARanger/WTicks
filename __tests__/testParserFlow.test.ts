@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
-import { readMockData } from "./mockFileRead";
+import { readExpectation, readMockData } from "./mockFileRead";
 import { ToStandaloneScript } from "../src/theory/parser";
 
 describe("Validating the parsed results based on the type of the file uploaded", function () {
@@ -9,11 +9,7 @@ describe("Validating the parsed results based on the type of the file uploaded",
 	describe("Validating the Script with valid test cases", function () {
 		const parser = new ToStandaloneScript();
 		parser.feed(readMockData("Adding&RemovingElements.side"));
-		const result = parser.parseTestCases();
-
-		test("Parsing must be successful", function () {
-			expect(result).toBe(true);
-		});
+		parser.parseTestCases();
 
 		test("Validating the locators collected", function () {
 			const locators = Array.from(Object.keys(parser.locators));
@@ -107,54 +103,105 @@ describe("Validating the parsed results based on the type of the file uploaded",
 	describe("file with some variable names", function () {
 		const parser = new ToStandaloneScript();
 		parser.feed(readMockData("WithVariableNames.side"));
+
 		const locators = parser.locators;
+		const test_case = "a75ae196-3bab-4d1c-b7db-ccd3b331ba6b";
+
+		const search_bar = "search_bar";
+		const search_bar_locator = "#\\\\:Ril56\\\\:";
+
+		const patched_names: { [key: string]: string } = {
+			"#\\\\:Ril56\\\\:-label": "search_bar_location",
+			"#\\\\:Ril56\\\\:": "youtube_search_bar",
+			".MuiInputAdornment-root > span": "search_bar_icon",
+			".MuiTooltip-tooltip": "tooltip",
+			"#__next": "body",
+			".MuiIconButton-sizeSmall": "search_button",
+			".MuiTypography-h6": "title",
+			".css-xkbv5f": "back_button",
+		};
 
 		test("Parsing must be successful", function () {
-			expect(parser.parseTestCases()).toBe(true);
+			expect(Object.keys(parser.locators)).toHaveLength(0);
+			expect(Object.keys(parser.parsedTestCases)).toHaveLength(0);
+
+			expect(parser.parseTestCases()).toBe(undefined);
+			// though its output is less informative but internally it did something useful
+
+			// it has parsed the locators
+			expect(Object.keys(parser.locators)).toHaveLength(8);
 		});
 
 		test("Expecting the test case to be parsed even if some of them are not used in the suite", function () {
+			// it also parses the test cases on high level
 			expect(Object.keys(parser.parsedTestCases)).toHaveLength(2);
+			expect(parser.parsedTestCases[test_case].step_name).toBe(
+				"Validating the search bar"
+			);
 		});
 
 		test("Verifying the Locators collected", function () {
 			const locations = Object.keys(locators);
-			expect(locations).toHaveLength(3);
 			expect(locations).toEqual([
-				"#:Ril56:",
-				"#:Ril56:-label",
-				".MuiTypography-root",
+				"#\\\\:Ril56\\\\:-label",
+				search_bar_locator,
+				".MuiInputAdornment-root > span",
+				".MuiTooltip-tooltip",
+				"#__next",
+				".MuiIconButton-sizeSmall",
+				".MuiTypography-h6",
+				".css-xkbv5f",
 			]);
 		});
 
 		test("Verifying if the parser is able to detect the names from the script", function () {
-			const given_name = locators["#:Ril56:"];
-			expect(given_name).toEqual("search_bar");
+			const given_name = locators[search_bar_locator];
+			expect(given_name).toBe(search_bar);
 		});
 
 		test("patching the variable names even those which are already defined", function () {
-			expect(parser.func_names.has("search_bar")).toBe(true);
-
-			expect(parser.patchName("#:Ril56:", "search_bar_location")).toBe(
-				true
-			);
-			expect(parser.patchName("#:Ril56:-label", "search_bar_label")).toBe(
-				true
-			);
+			expect(parser.func_names.has(search_bar)).toBe(true);
 			expect(
-				parser.patchName(".MuiTypography-root", "confirm_button")
+				parser.patchName(
+					search_bar_locator,
+					patched_names[search_bar_locator]
+				)
 			).toBe(true);
+			expect(parser.func_names.has(search_bar)).toBe(false);
+		});
 
-			expect(parser.func_names.has("search_bar")).toBe(false);
+		test("Patching rest of the locators", function () {
+			expect(parser.needForPatch()).toBe(true);
+
+			Object.keys(patched_names).forEach(function (name) {
+				expect(parser.patchName(name, patched_names[name])).toBe(true); // patch was successfully
+			});
 		});
 
 		test("Checking if the parser still needs a patch", function () {
 			expect(parser.needForPatch()).toBe(false);
 		});
 
-		test("Verifying the script generated at the end", function () {
-			const scriptGenerated = parser.genScript;
-			expect(scriptGenerated).toBe("");
+		test("Parsing the commands for the requested test case", function () {
+			const parsed_test_case = parser.parsedTestCases[test_case];
+
+			parsed_test_case.commands.forEach((command) => {
+				expect(command.parsed).toBeUndefined();
+			});
+
+			const test_cases_patched = parser.patchCommands(test_case);
+			expect(test_cases_patched).toEqual(new Set([test_case]));
+
+			parsed_test_case.commands.forEach((command) => {
+				expect(typeof command.parsed).toBe("string");
+			});
+		});
+
+		test("Generating the script required for the test case", function () {
+			const script = parser.genScript(test_case);
+			expect(script).toBe(
+				readExpectation("testWithVariableNameScript.js")
+			);
 		});
 	});
 });

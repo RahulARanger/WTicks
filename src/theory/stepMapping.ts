@@ -13,6 +13,15 @@ export function insideQuotes(value: any): any {
 	return typeof value === "string" ? `\"${value}\"` : value;
 }
 
+export function transitions(command_name: string) {
+	const to_assert = command_name.startsWith("verify");
+	let f_command_name = to_assert
+		? command_name.replace("verify", "assert")
+		: command_name;
+
+	return f_command_name;
+}
+
 export function mapSteps(
 	step: ParsedTestStep,
 	locator_name: string
@@ -37,17 +46,18 @@ export function mapSteps(
 
 	// supported
 
-	const isOpposite = step.command_name.startsWith("assertNot");
+	let command_name = transitions(step.command_name);
+	const isOpposite = command_name.startsWith("assertNot");
+
+	command_name = isOpposite ? command_name.replace("Not", "") : command_name;
 
 	const template = !step.isLocator
 		? "await "
-		: step.command_name.startsWith("assert")
+		: command_name.startsWith("assert")
 		? `await expect(pageClass.${locator_name}).${oppPrefix(isOpposite)}`
 		: `await pageClass.${locator_name}.`;
 
-	switch (
-		isOpposite ? step.command_name.replace("Not", "") : step.command_name
-	) {
+	switch (command_name) {
 		case "check":
 		case "click": {
 			return template + "click();";
@@ -68,7 +78,7 @@ export function mapSteps(
 		// assertions
 
 		case "assertText": {
-			return template + `.toHaveText(${insideQuotes(step.value)})`;
+			return template + `toHaveText(${insideQuotes(step.value)})`;
 		}
 		case "assertTitle": {
 			return (
@@ -78,15 +88,18 @@ export function mapSteps(
 		}
 
 		case "assertElementPresent": {
-			return template + `toBeDisplayed();`;
+			return template + "toBePresent();";
+		}
+		case "assertElementNotPresent": {
+			return template + "not.toBePresent();";
 		}
 
 		case "assertEditable": {
-			return template + `toBeEnabled();`;
+			return template + "toBeEnabled();";
 		}
 
 		case "assertChecked": {
-			return template + `toBeChecked();`;
+			return template + "toBeChecked();";
 		}
 
 		case "assertText": {
@@ -122,9 +135,10 @@ export function mapSteps(
 		}
 
 		default: {
-			throw new Error(
-				"This step is not expected, please let the owner know that there is a new command if the command is a valid ones"
+			console.error(
+				`${step.command_name} is not a valid locator, let me know if it is one, it might be missed from my side.`
 			);
+			return false;
 		}
 	}
 }
