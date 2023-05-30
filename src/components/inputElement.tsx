@@ -1,5 +1,5 @@
 import TextField, { TextFieldProps } from "@mui/material/TextField";
-import { ChangeEvent, Component } from "react";
+import { ChangeEvent, Component, FocusEvent } from "react";
 import { alpha, styled } from "@mui/material/styles";
 import { OutlinedInputProps } from "@mui/material/OutlinedInput";
 
@@ -46,21 +46,44 @@ export default class InputTextField extends Component<
 > {
 	state: TextFieldState = {};
 
-	handleValidation(event: ChangeEvent<HTMLInputElement>): void {
-		if (!this.props.regexToMaintain) return;
-		const text = event.target.value;
+	validateInput(text: string): boolean {
+		if (!this.props.regexToMaintain) return false;
 		const isError = !this.props.regexToMaintain?.test(text);
 		this.setState({ error: isError });
+		return isError;
+	}
+
+	handleValidation(event: FocusEvent<HTMLInputElement>): void {
+		const text = event.target.value;
+		const isError = this.validateInput(text);
 		if (this.props.afterValidation)
 			this.props.afterValidation(text, String(this.props.label), isError);
 	}
 
+	notifyUser(event: ChangeEvent<HTMLInputElement>): void {
+		const text = event.target.value;
+		const isError = this.validateInput(text);
+		if (this.props.afterValidation)
+			this.props.afterValidation(text, String(this.props.label), true);
+		// treated as error from the pending preceptive
+	}
+
 	render() {
+		const refined_props = { ...this.props };
+
+		delete refined_props.regexToMaintain;
+		delete refined_props.afterValidation;
+
 		return (
 			<CustomizedTextField
 				error={this.state.error || false}
-				{...this.props}
+				{...refined_props}
 				onChange={
+					this.props.regexToMaintain
+						? this.notifyUser.bind(this)
+						: undefined
+				}
+				onBlur={
 					this.props.regexToMaintain
 						? this.handleValidation.bind(this)
 						: undefined

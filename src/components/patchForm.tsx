@@ -89,11 +89,14 @@ export class PatchForm extends Component<FormProps, FormState> {
 	}
 
 	genTooltipMessage(): string {
-		return this.state.error || !this.state.selectedOption
-			? "Please select the test component"
-			: this.state.goodToGenerate
-			? "Generate script"
-			: "Please verify before generating";
+		return (
+			this.state.error ||
+			(!this.state.selectedOption
+				? "Please select the test component"
+				: this.state.goodToGenerate
+				? "Generate script"
+				: "Please verify before generating")
+		);
 	}
 
 	// validation or state changer methods
