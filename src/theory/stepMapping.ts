@@ -1,3 +1,4 @@
+import { to_good_name } from "./scriptGenerators";
 import { LocationResult, ParsedTestStep } from "./sharedTypes";
 
 function oppPrefix(isOpposite: boolean): string {
@@ -28,13 +29,6 @@ export function mapSteps(
 ): boolean | string {
 	// unsupported but expected
 	switch (step.command_name) {
-		case "run": {
-			console.info(
-				"run is ignored as we combine all the test scripts based on the parts of the scenario"
-			);
-			return true;
-		}
-
 		case "if":
 		case "while": {
 			console.info(
@@ -58,6 +52,9 @@ export function mapSteps(
 		: `await pageClass.${locator_name}.`;
 
 	switch (command_name) {
+		case "run": {
+			return `await ${to_good_name(step.target)}();`;
+		}
 		case "check":
 		case "click": {
 			return template + "click();";

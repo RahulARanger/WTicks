@@ -61,7 +61,6 @@ export class PatchForm extends Component<FormProps, FormState> {
 
 	constructor(props: FormProps) {
 		super(props);
-		console.log(this.parser().locators);
 		for (let locator of Object.keys(props.parser.locators)) {
 			this.state.locators[locator] = this.parser().locators[locator];
 		}
