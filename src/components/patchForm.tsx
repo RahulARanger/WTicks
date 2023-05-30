@@ -89,14 +89,12 @@ export class PatchForm extends Component<FormProps, FormState> {
 	}
 
 	genTooltipMessage(): string {
-		return (
-			this.state.error ||
-			(!this.state.selectedOption
-				? "Please select the test component"
-				: this.state.goodToGenerate
-				? "Generate script"
-				: "Please verify before generating")
-		);
+		return this.state.goodToGenerate && this.state.selectedOption
+			? "Generate Script"
+			: this.state.error ||
+					(!this.state.selectedOption
+						? "Please select the test component"
+						: "Please verify before generating");
 	}
 
 	// validation or state changer methods
@@ -125,21 +123,37 @@ export class PatchForm extends Component<FormProps, FormState> {
 		const locators = this.state.locators;
 		const namesRequested = new Set();
 		let isThereDuplicate = false;
+		let isThereError = false;
+		const duplicates = new Set();
 
-		for (let locator of Object.keys(locators)) {
+		const locator_keys = Object.keys(locators);
+
+		// first loop is to collect the duplicate names
+		locator_keys.forEach((locator) => {
 			const request = locators[locator].text;
 			if (namesRequested.has(request)) {
 				isThereDuplicate = true;
-				break;
+				duplicates.add(request);
 			}
 			namesRequested.add(request);
-		}
+		});
+
+		// second loop is to mark the pending fields
+		locator_keys.forEach((locator) => {
+			const text = locators[locator].text;
+			locators[locator].isError =
+				duplicates.has(text) || !test_var_name.test(text);
+			isThereError ||= !!locators[locator].isError;
+		});
 
 		this.setState({
-			goodToGenerate: !isThereDuplicate,
+			goodToGenerate: !isThereDuplicate && !isThereError,
+			locators,
 			error: isThereDuplicate
 				? "Please ensure we do not use duplicate names"
-				: this.state.error,
+				: isThereError
+				? "Please rectify the error before verifying it"
+				: this.genTooltipMessage(),
 			showPendingAlone: isThereDuplicate
 				? true
 				: this.state.showPendingAlone,
