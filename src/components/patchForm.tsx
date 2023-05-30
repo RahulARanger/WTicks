@@ -61,11 +61,14 @@ export class PatchForm extends Component<FormProps, FormState> {
 		locators: {},
 		activeStep: 0,
 		goodToGenerate: false,
-		error: "Please select the test case",
+		error: "",
 	};
 
 	constructor(props: FormProps) {
 		super(props);
+
+		const requestedLength = Object.keys(this.state.locators).length;
+
 		for (let locator of Object.keys(props.parser.locators)) {
 			const requested = this.parser().locators[locator];
 			this.state.locators[locator] = {
@@ -73,8 +76,8 @@ export class PatchForm extends Component<FormProps, FormState> {
 				isError: !test_var_name.test(requested),
 			};
 		}
-		this.state.showPendingAlone =
-			Object.keys(this.state.locators).length > 10;
+
+		this.state.showPendingAlone = requestedLength > 10;
 	}
 	// HELPER METHODS
 	parser() {
@@ -83,6 +86,14 @@ export class PatchForm extends Component<FormProps, FormState> {
 
 	didUserComplete(): boolean {
 		return Boolean(this.state.goodToGenerate && this.state.selectedOption);
+	}
+
+	genTooltipMessage(): string {
+		return this.state.error || !this.state.selectedOption
+			? "Please select the test component"
+			: this.state.goodToGenerate
+			? "Generate script"
+			: "Please verify before generating";
 	}
 
 	// validation or state changer methods
@@ -133,7 +144,8 @@ export class PatchForm extends Component<FormProps, FormState> {
 	}
 
 	renderSteps() {
-		const labels = ["Assigning Names", "Script Configuration"];
+		const labels = ["Assigning Names"];
+		// "Script Configuration" is work in progress
 
 		return (
 			<Stepper nonLinear activeStep={this.state.activeStep}>
@@ -144,6 +156,7 @@ export class PatchForm extends Component<FormProps, FormState> {
 								index={index}
 								key={label}
 								completed={this.didUserComplete()}
+								disabled={index !== 0}
 							>
 								<StepButton
 									onClick={() =>
@@ -291,6 +304,46 @@ export class PatchForm extends Component<FormProps, FormState> {
 		);
 	}
 
+	// TODO: work in progress
+	askIfNeededMore() {
+		const details: string[] = [];
+
+		const selected = this.state.selectedOption;
+		if (!selected || selected === null) return <></>;
+
+		if (selected.is_suite) {
+			const test_cases = this.parser().fetchSuite(selected.value);
+			if (!test_cases) return <></>;
+			details.push(
+				...test_cases.tests.map(
+					(test_id) =>
+						this.parser().parsedTestCases[test_id].step_name
+				)
+			);
+		} else details.push(this.state?.selectedOption?.value || "");
+
+		return selected.is_suite ? (
+			<List
+				className={formStyles.listContainer}
+				subheader={
+					<ListSubheader>
+						{selected.is_suite
+							? "Test Cases in suite"
+							: "Test Case selected"}
+					</ListSubheader>
+				}
+			>
+				<>
+					{details.map((item) => {
+						return <ListItem key={item}>{item}</ListItem>;
+					})}
+				</>
+			</List>
+		) : (
+			<Typography>Selected Test Case:</Typography>
+		);
+	}
+
 	renderForm() {
 		const locators = this.props.parser.locators;
 		const savedLength = Object.keys(locators).length;
@@ -300,11 +353,9 @@ export class PatchForm extends Component<FormProps, FormState> {
 			<FormControl className={formStyles.formBox}>
 				<>
 					{this.renderSteps()}
-					{this.state.activeStep === 0 ? (
-						this.askForLocators(hasLocators)
-					) : (
-						<></>
-					)}
+					{this.state.activeStep === 0
+						? this.askForLocators(hasLocators)
+						: this.askIfNeededMore()}
 					<Stack flexDirection="row" columnGap={"12px"}>
 						{hasLocators ? (
 							<Button
@@ -317,7 +368,7 @@ export class PatchForm extends Component<FormProps, FormState> {
 						) : (
 							<></>
 						)}
-						<Tooltip title={this.state.error || "Generate Script"}>
+						<Tooltip title={this.genTooltipMessage()}>
 							<span>
 								<Button
 									variant="outlined"

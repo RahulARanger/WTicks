@@ -62,7 +62,20 @@ abstract class GeneralizeVariable {
 			const test_case = this.parsedTestCases[test_id];
 			if (!test_case) return;
 			test_case.commands = test_case.commands.map((step) => {
-				const text = mapSteps(step, this.locators[step.target]);
+				let text = mapSteps(step, this.locators[step.target]);
+
+				// this is required for supporting the run command
+				if (step.command_name == "run") {
+					const test_name = step.command_name;
+					const test_case = Object.keys(this.parsedTestCases).find(
+						(test_id) =>
+							this.parsedTestCases[test_id].step_name ===
+							test_name
+					);
+
+					if (!test_case) text = false; // invalid step_name
+					else ids.add(test_case);
+				}
 				return {
 					...step,
 					parsed: text,
@@ -140,14 +153,18 @@ abstract class GeneralizeVariable {
 		};
 	}
 
-	parseSuite(suite_id: string): void | string {
+	fetchSuite(suite_id: string): void | TestSuite {
 		// assuming test cases were already parsed
 		if (!this.parsed?.suites) return;
 
 		const suite = this.parsed?.suites.find(
 			(suite) => suite_id === suite.id
 		);
+		return suite;
+	}
 
+	parseSuite(suite_id: string): void | string {
+		const suite = this.fetchSuite(suite_id);
 		if (!suite) return;
 		this.patchCommands(...suite.tests);
 		return suite.name;
