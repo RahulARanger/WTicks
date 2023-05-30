@@ -4,6 +4,10 @@ import { alpha, styled } from "@mui/material/styles";
 import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import StepButton from "@mui/material/StepButton";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -26,13 +30,12 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { ParsedTestCase, TestSuite } from "@/theory/sharedTypes";
 
 interface FormState {
-	index: number;
 	showPendingAlone: boolean;
-	locators: { [key: string]: RefObject<HTMLInputElement> };
+	locators: { [key: string]: string };
 	goodToGenerate: boolean;
 	error?: string;
-	isTestCaseSelected?: boolean;
-	selectedOption?: string;
+	selectedOption?: null | OptionType;
+	activeStep: number;
 }
 
 interface FormProps {
@@ -49,22 +52,104 @@ interface OptionType {
 
 export class PatchForm extends Component<FormProps, FormState> {
 	state: FormState = {
-		index: 0,
 		showPendingAlone: false,
 		locators: {},
+		activeStep: 0,
 		goodToGenerate: false,
 		error: "Please select the test case",
 	};
 
 	constructor(props: FormProps) {
 		super(props);
+		console.log(this.parser().locators);
 		for (let locator of Object.keys(props.parser.locators)) {
-			this.state.locators[locator] = createRef<HTMLInputElement>();
+			this.state.locators[locator] = this.parser().locators[locator];
 		}
+		this.state.showPendingAlone =
+			Object.keys(this.state.locators).length > 10;
 	}
-
+	// HELPER METHODS
 	parser() {
 		return this.props.parser;
+	}
+
+	didUserComplete(): boolean {
+		return Boolean(this.state.goodToGenerate && this.state.selectedOption);
+	}
+
+	// validation or state changer methods
+	identifyUnsavedChanges(text: string, locator: string, isError: boolean) {
+		const locators = this.state.locators;
+		locators[locator] = text;
+
+		if (!this.state.goodToGenerate) return this.setState({ locators });
+
+		const same = this.props.parser.locators[locator] === text;
+		const so = isError ? false : same;
+		const errorMsg = isError
+			? "Error found in one of the input"
+			: same
+			? undefined
+			: "Please verify before generating the script";
+
+		this.setState({
+			goodToGenerate: so,
+			error: errorMsg,
+			locators,
+		});
+	}
+
+	verifySelection() {
+		const locators = this.state.locators;
+		const namesRequested = new Set();
+		let isThereDuplicate = false;
+
+		for (let locator of Object.keys(locators)) {
+			const request = locators[locator];
+			if (namesRequested.has(request)) {
+				isThereDuplicate = true;
+				break;
+			}
+			namesRequested.add(request);
+		}
+
+		this.setState({
+			goodToGenerate: !isThereDuplicate,
+			error: isThereDuplicate
+				? "Please ensure we do not use duplicate names"
+				: this.state.error,
+			showPendingAlone: isThereDuplicate
+				? true
+				: this.state.showPendingAlone,
+		});
+	}
+
+	renderSteps() {
+		const labels = ["Assigning Names", "Script Configuration"];
+
+		return (
+			<Stepper nonLinear activeStep={this.state.activeStep}>
+				<>
+					{labels.map((label, index) => {
+						return (
+							<Step
+								index={index}
+								key={label}
+								completed={this.didUserComplete()}
+							>
+								<StepButton
+									onClick={() =>
+										this.setState({ activeStep: index })
+									}
+								>
+									{label}
+								</StepButton>
+							</Step>
+						);
+					})}
+				</>
+			</Stepper>
+		);
 	}
 
 	renderOptions() {
@@ -93,7 +178,7 @@ export class PatchForm extends Component<FormProps, FormState> {
 				}
 				size={"small"}
 				getOptionLabel={(option) => option.label}
-				sx={{ width: 300, mb: "10px" }}
+				sx={{ width: 300, marginY: "10px", alignSelf: "stretch" }}
 				renderInput={(params) => (
 					<InputTextField
 						label="Pick the Test case/suite to export"
@@ -108,7 +193,138 @@ export class PatchForm extends Component<FormProps, FormState> {
 						sx={{ border: "1.5px solid black" }}
 					/>
 				)}
+				onChange={(_, value) =>
+					this.setState({ selectedOption: value })
+				}
 			/>
+		);
+	}
+
+	renderListItems() {
+		const locators = this.parser().locators;
+
+		return (
+			<List className={formStyles.listContainer}>
+				{Object.keys(locators)
+					.filter((locator) =>
+						this.state.showPendingAlone
+							? !this.state.locators[locator]
+							: true
+					)
+					.map((locator) => {
+						return (
+							<ListItem key={locator} disableGutters>
+								<InputTextField
+									label={locator}
+									defaultValue={locators[locator]}
+									required
+									placeholder="Not yet decided"
+									regexToMaintain={test_var_name}
+									sx={{ width: "100%" }}
+									value={this.state.locators[locator]}
+									afterValidation={this.identifyUnsavedChanges.bind(
+										this
+									)}
+								/>
+							</ListItem>
+						);
+					})}
+			</List>
+		);
+	}
+
+	renderInputs(hasLocators: boolean) {
+		return (
+			<>
+				{hasLocators ? (
+					this.renderListItems()
+				) : (
+					<Typography
+						variant="h6"
+						color="paleturquoise"
+						alignItems="center"
+						flexGrow={1}
+						sx={{ display: "flex" }}
+						alignSelf="center"
+					>
+						No Locators found
+					</Typography>
+				)}
+			</>
+		);
+	}
+
+	askForLocators(hasLocators: boolean) {
+		return (
+			<>
+				{this.renderOptions()}
+				<Typography variant="subtitle1" sx={{ alignSelf: "stretch" }}>
+					Please fill the names of the locators.
+					<Divider variant="fullWidth" />
+				</Typography>
+
+				<FormControlLabel
+					label="Filter Pending"
+					control={
+						<Switch
+							size="small"
+							checked={this.state.showPendingAlone}
+							onChange={(_) => {
+								this.setState({
+									showPendingAlone:
+										!this.state.showPendingAlone,
+								});
+							}}
+						/>
+					}
+				/>
+				{this.renderInputs(hasLocators)}
+			</>
+		);
+	}
+
+	renderForm() {
+		const locators = this.props.parser.locators;
+		const savedLength = Object.keys(locators).length;
+		const hasLocators = savedLength > 0;
+
+		return (
+			<FormControl className={formStyles.formBox}>
+				<>
+					{this.renderSteps()}
+					{this.state.activeStep === 0 ? (
+						this.askForLocators(hasLocators)
+					) : (
+						<></>
+					)}
+					<Stack flexDirection="row" columnGap={"12px"}>
+						{hasLocators ? (
+							<Button
+								variant="outlined"
+								color="secondary"
+								onClick={this.verifySelection.bind(this)}
+							>
+								Verify
+							</Button>
+						) : (
+							<></>
+						)}
+						<Tooltip title={this.state.error || "Generate Script"}>
+							<span>
+								<Button
+									variant="outlined"
+									disabled={
+										!this.state.selectedOption ||
+										!this.state.goodToGenerate
+									}
+								>
+									Generate
+								</Button>
+							</span>
+						</Tooltip>
+					</Stack>
+				</>
+			</FormControl>
 		);
 	}
 
@@ -128,170 +344,9 @@ export class PatchForm extends Component<FormProps, FormState> {
 						height: "100%",
 					}}
 				>
-					{this.state.index === 0
-						? this.askForLocators()
-						: this.askForMethods()}
+					{this.renderForm()}
 				</Paper>
 			</Drawer>
 		);
-	}
-
-	renderListItems() {
-		const locators = this.props.parser.locators;
-
-		return (
-			<List className={formStyles.listContainer}>
-				{Object.keys(locators)
-					.filter((locator) =>
-						this.state.showPendingAlone
-							? !this.state.locators[locator].current
-							: true
-					)
-					.map((locator) => {
-						return (
-							<ListItem key={locator} disableGutters>
-								<InputTextField
-									label={locator}
-									defaultValue={locators[locator]}
-									required
-									placeholder="Not yet decided"
-									regexToMaintain={test_var_name}
-									sx={{ width: "100%" }}
-									inputRef={this.state.locators[locator]}
-									afterValidation={this.resetGenerate.bind(
-										this
-									)}
-								/>
-							</ListItem>
-						);
-					})}
-			</List>
-		);
-	}
-
-	resetGenerate(text: string, locator: string, isError: boolean) {
-		if (!this.state.goodToGenerate) return;
-
-		const same = this.props.parser.locators[locator] === text;
-		const so = isError ? false : same;
-
-		this.setState({
-			goodToGenerate: so,
-			error: so
-				? undefined
-				: isError
-				? "Error found in one of the input"
-				: "Please verify before generating it",
-		});
-	}
-
-	renderInputs() {
-		const locators = this.props.parser.locators;
-		const savedLength = Object.keys(locators).length;
-		const hasLocators = savedLength > 0;
-
-		return (
-			<>
-				{hasLocators ? (
-					this.renderListItems()
-				) : (
-					<Typography
-						variant="h6"
-						color="paleturquoise"
-						alignItems="center"
-						flexGrow={1}
-						sx={{ display: "flex" }}
-						alignSelf="center"
-					>
-						No Locators found
-					</Typography>
-				)}
-				<Stack flexDirection="row" columnGap={"12px"}>
-					{hasLocators ? (
-						<Button
-							variant="outlined"
-							color="secondary"
-							onClick={this.verifySelection.bind(this)}
-						>
-							Verify
-						</Button>
-					) : (
-						<></>
-					)}
-					<Tooltip title={this.state.error || "Generate Script"}>
-						<span>
-							<Button
-								variant="outlined"
-								disabled={!this.state.goodToGenerate}
-							>
-								Generate
-							</Button>
-						</span>
-					</Tooltip>
-				</Stack>
-			</>
-		);
-	}
-
-	askForLocators() {
-		return (
-			<FormControl className={formStyles.formBox}>
-				<>
-					<Typography
-						variant="subtitle1"
-						sx={{ mb: "12px", alignSelf: "stretch" }}
-					>
-						Please fill the names of the locators.
-						<Divider variant="fullWidth" />
-					</Typography>
-					{this.renderOptions()}
-					<FormControlLabel
-						label="Filter Pending"
-						control={
-							<Switch
-								size="small"
-								checked={this.state.showPendingAlone}
-								onChange={(_) => {
-									this.setState({
-										showPendingAlone:
-											!this.state.showPendingAlone,
-									});
-								}}
-							/>
-						}
-					/>
-					{this.renderInputs()}
-				</>
-			</FormControl>
-		);
-	}
-
-	verifySelection() {
-		const locators = this.state.locators;
-		const namesRequested = new Set();
-		let isThereUnfilled = false;
-		let isThereDuplicate = false;
-
-		for (let locator of Object.keys(locators)) {
-			const input = locators[locator].current;
-			if (!input) continue;
-			const request = input.value;
-			if (namesRequested.has(request)) {
-				isThereDuplicate = true;
-				break;
-			}
-			namesRequested.add(input.value);
-		}
-
-		this.setState({
-			goodToGenerate: !isThereDuplicate,
-			error: isThereDuplicate
-				? "Please ensure we do not use duplicate names"
-				: "",
-		});
-	}
-
-	askForMethods() {
-		return <></>;
 	}
 }
