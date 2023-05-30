@@ -27,7 +27,7 @@ interface TimelineItems {
 }
 
 interface TimelineProps {
-	patchThings: (didWeParseTestCases: boolean) => void;
+	patchThings: () => void;
 	parser?: ToStandaloneScript;
 }
 
@@ -122,34 +122,42 @@ export class TimelineComponent extends Component<TimelineProps, TimelineItems> {
 		);
 	}
 
+	juggleToMainItems() {
+		this.state.mainItems.push(
+			...this.state.resettableItems.splice(
+				0,
+				this.state.resettableItems.length
+			)
+		);
+	}
+
 	handleDispatchedItems(item: ShareDetails) {
 		switch (item.type) {
 			case "parsedTestCase": {
 				// called only if the test case is failed
-				const relatedItem = this.state.resettableItems.push({
+				this.state.resettableItems.push({
 					completed: true,
-					title: "Parse a Test case",
-					description: "Failed to parse the test case " + item.result,
-					failed: true,
+					title: "Parse: Test Case",
+					description: "Test Case: " + item.result,
 				});
-				if (!relatedItem) return;
-				this.setState({ resettableItems: this.state.resettableItems });
+				break;
 			}
-
 			case "parsedTestCases": {
-				const relatedItem = this.state.mainItems.at(-1);
-				if (!relatedItem) return;
-
-				relatedItem.failed = !item.result;
-				relatedItem.title = "Parsed Test Cases";
-				relatedItem.description = item.result
-					? "Parsed Test Cases successfully"
-					: "Failed to parse the test case, please refer to the previous timestamp";
-				relatedItem.completed = true;
-				this.setState({ mainItems: this.state.mainItems });
-				this.props.patchThings(!relatedItem.failed);
+				const mainItem = this.state.mainItems.at(-1);
+				if (mainItem) {
+					mainItem.completed = true;
+					mainItem.title = "Parse: Test Cases";
+					mainItem.description = "Parsed required test cases";
+				}
+				this.juggleToMainItems();
+				break;
 			}
 		}
+
+		this.setState({
+			resettableItems: this.state.resettableItems,
+			mainItems: this.state.mainItems,
+		});
 	}
 
 	componentDidMount(): void | Promise<void> {
@@ -159,7 +167,7 @@ export class TimelineComponent extends Component<TimelineProps, TimelineItems> {
 		parser.feedDispatcher(this.handleDispatchedItems.bind(this));
 
 		this.state.mainItems.push({
-			title: "Parsing the test cases",
+			title: "Parsing",
 			completed: false,
 			description: "Parsing the test cases inside all the suites",
 		});
@@ -167,6 +175,7 @@ export class TimelineComponent extends Component<TimelineProps, TimelineItems> {
 		this.setState({ mainItems: this.state.mainItems });
 		return new Promise((resolve) => {
 			parser.parseTestCases();
+			this.props.patchThings();
 			resolve();
 		});
 	}

@@ -39,14 +39,6 @@ abstract class GeneralizeVariable {
 		this.dispatcher = dispatcher;
 	}
 
-	generate_random_name(length: number): string {
-		const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		return Array(length)
-			.fill(true)
-			.map((_) => chars[Math.floor(Math.random() * chars.length)])
-			.join("");
-	}
-
 	generate_name(name: string | false): string {
 		if (name === false) return "";
 
@@ -59,10 +51,7 @@ abstract class GeneralizeVariable {
 	generateLocatorClass(): string {
 		return generateClass(
 			Object.keys(this.locators).map((key) =>
-				generateClassMethod(
-					this.locators[key] || this.generate_random_name(6),
-					key
-				)
+				generateClassMethod(this.locators[key], key)
 			)
 		);
 	}
@@ -113,12 +102,10 @@ abstract class GeneralizeVariable {
 
 		let func_name = var_name;
 		const isUsed = this.func_names.has(func_name);
-		const isNotValid = !test_var_name.test(func_name);
+		// isUsed is valuable info for validation and it cannot be used everytime
+		// hence converting all the rest of the duplicates to null string
 
-		this.locators[location.target] =
-			isNotValid || isUsed
-				? this.generate_name(isUsed ? false : func_name)
-				: func_name;
+		this.locators[location.target] = isUsed ? "" : func_name;
 		this.func_names.add(var_name);
 
 		return location;
@@ -184,6 +171,12 @@ export abstract class Listener extends GeneralizeVariable {
 				type: "parsedTestCase",
 				result: testCase.name,
 			});
+	}
+
+	parseTestCases(): void {
+		super.parseTestCases();
+		this.dispatcher &&
+			this.dispatcher({ type: "parsedTestCases", result: "" });
 	}
 }
 

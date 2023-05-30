@@ -29,9 +29,14 @@ import {
 import Autocomplete from "@mui/material/Autocomplete";
 import { ParsedTestCase, TestSuite } from "@/theory/sharedTypes";
 
+interface InputStatus {
+	text: string;
+	isError?: boolean;
+}
+
 interface FormState {
 	showPendingAlone: boolean;
-	locators: { [key: string]: string };
+	locators: { [key: string]: InputStatus };
 	goodToGenerate: boolean;
 	error?: string;
 	selectedOption?: null | OptionType;
@@ -62,7 +67,11 @@ export class PatchForm extends Component<FormProps, FormState> {
 	constructor(props: FormProps) {
 		super(props);
 		for (let locator of Object.keys(props.parser.locators)) {
-			this.state.locators[locator] = this.parser().locators[locator];
+			const requested = this.parser().locators[locator];
+			this.state.locators[locator] = {
+				text: requested,
+				isError: !test_var_name.test(requested),
+			};
 		}
 		this.state.showPendingAlone =
 			Object.keys(this.state.locators).length > 10;
@@ -79,7 +88,7 @@ export class PatchForm extends Component<FormProps, FormState> {
 	// validation or state changer methods
 	identifyUnsavedChanges(text: string, locator: string, isError: boolean) {
 		const locators = this.state.locators;
-		locators[locator] = text;
+		locators[locator] = { text, isError };
 
 		if (!this.state.goodToGenerate) return this.setState({ locators });
 
@@ -104,7 +113,7 @@ export class PatchForm extends Component<FormProps, FormState> {
 		let isThereDuplicate = false;
 
 		for (let locator of Object.keys(locators)) {
-			const request = locators[locator];
+			const request = locators[locator].text;
 			if (namesRequested.has(request)) {
 				isThereDuplicate = true;
 				break;
@@ -201,16 +210,31 @@ export class PatchForm extends Component<FormProps, FormState> {
 
 	renderListItems() {
 		const locators = this.parser().locators;
+		const filtered = Object.keys(locators).filter((locator) =>
+			this.state.showPendingAlone
+				? this.state.locators[locator].isError
+				: true
+		);
 
 		return (
-			<List className={formStyles.listContainer}>
-				{Object.keys(locators)
-					.filter((locator) =>
-						this.state.showPendingAlone
-							? !this.state.locators[locator]
-							: true
-					)
-					.map((locator) => {
+			<>
+				<FormControlLabel
+					label={`Filter Pending [${filtered.length}]`}
+					control={
+						<Switch
+							size="small"
+							checked={this.state.showPendingAlone}
+							onChange={(_) => {
+								this.setState({
+									showPendingAlone:
+										!this.state.showPendingAlone,
+								});
+							}}
+						/>
+					}
+				/>
+				<List className={formStyles.listContainer}>
+					{filtered.map((locator) => {
 						return (
 							<ListItem key={locator} disableGutters>
 								<InputTextField
@@ -220,7 +244,7 @@ export class PatchForm extends Component<FormProps, FormState> {
 									placeholder="Not yet decided"
 									regexToMaintain={test_var_name}
 									sx={{ width: "100%" }}
-									value={this.state.locators[locator]}
+									value={this.state.locators[locator].text}
 									afterValidation={this.identifyUnsavedChanges.bind(
 										this
 									)}
@@ -228,7 +252,8 @@ export class PatchForm extends Component<FormProps, FormState> {
 							</ListItem>
 						);
 					})}
-			</List>
+				</List>
+			</>
 		);
 	}
 
@@ -261,22 +286,6 @@ export class PatchForm extends Component<FormProps, FormState> {
 					Please fill the names of the locators.
 					<Divider variant="fullWidth" />
 				</Typography>
-
-				<FormControlLabel
-					label="Filter Pending"
-					control={
-						<Switch
-							size="small"
-							checked={this.state.showPendingAlone}
-							onChange={(_) => {
-								this.setState({
-									showPendingAlone:
-										!this.state.showPendingAlone,
-								});
-							}}
-						/>
-					}
-				/>
 				{this.renderInputs(hasLocators)}
 			</>
 		);
