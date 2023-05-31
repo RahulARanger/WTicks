@@ -136,13 +136,6 @@ abstract class GeneralizeVariable {
 		const commands = [];
 		for (let command of testCase.commands) {
 			const result = this.parseTestStep(command);
-			if (result && result.isLocator) {
-				command.target = result.target = result.target.replaceAll(
-					":",
-					"\\\\:"
-				); // https://stackoverflow.com/a/3544927/12318454
-			}
-
 			if (result) commands.push(result);
 		}
 
@@ -220,7 +213,7 @@ export class ToStandaloneScript extends Listener {
 			this.generateLocatorClass(),
 			"const pageClass = new Locators();",
 			...tests,
-			generating_caller_iife(func_names),
+			generating_caller_iife([...func_names, "browser.deleteSession"]),
 		].join("\n\n");
 	}
 }

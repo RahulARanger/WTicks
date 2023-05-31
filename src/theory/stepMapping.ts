@@ -109,7 +109,7 @@ export function mapSteps(
 
 		// browser actions
 		case "pause": {
-			return template + `browser.pause(${insideQuotes(step.value)});`;
+			return template + `browser.pause(${step.target});`;
 		}
 
 		case "runScript": {
@@ -147,7 +147,7 @@ export function parseLocators(locator: string): LocationResult {
 	let location = locator;
 	switch (strategy) {
 		case "id":
-			location = `#${value}`;
+			location = `#${value}`.replaceAll(":", "\\\\:"); // https://stackoverflow.com/a/3544927/12318454;
 			break;
 		case "name":
 			location = `[name='${value}']`;
@@ -180,7 +180,7 @@ export function parseLocators(locator: string): LocationResult {
 	}
 
 	return {
-		isLocator: locator !== location,
+		isLocator: location !== locator,
 		target: location,
 	};
 }

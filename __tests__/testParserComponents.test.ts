@@ -127,7 +127,7 @@ describe("Validating the step mappings", function () {
 				value: "",
 				command_name: "run",
 			},
-			output: true,
+			output: "await Some_Script();",
 		},
 		{
 			input: {

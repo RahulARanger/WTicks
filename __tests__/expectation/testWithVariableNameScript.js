@@ -17,8 +17,11 @@ class Locators {
 	$(location) {
 		return browser.$(location);
 	}
-	get search_bar() {
+	get search_bar_location() {
 		return this.$("#\\:Ril56\\:-label");
+	}
+	get youtube_search_bar() {
+		return this.$("#\\:Ril56\\:");
 	}
 	get search_bar_icon() {
 		return this.$(".MuiInputAdornment-root > span");
@@ -38,12 +41,6 @@ class Locators {
 	get back_button() {
 		return this.$(".css-xkbv5f");
 	}
-	get youtube_search_bar() {
-		return this.$("#\\:Ril56\\:");
-	}
-	get search_bar_location() {
-		return this.$("#\\:Ril56\\:-label");
-	}
 };
 
 
@@ -57,6 +54,8 @@ async function validating_the_search_bar() {
 	await pageClass.youtube_search_bar.click();
 	await expect(pageClass.search_bar_icon).toBePresent();
 	await pageClass.search_bar_icon.click();
+	await browser.pause(600);
+	await pageClass.search_bar_icon.click();
 	await expect(pageClass.tooltip).toHaveText("Invalid Input")
 	await pageClass.youtube_search_bar.click();
 	await pageClass.body.click();
@@ -68,5 +67,6 @@ async function validating_the_search_bar() {
 }
 
 ; (async () => {
-	validating_the_search_bar();
+	await validating_the_search_bar();
+	await browser.deleteSession();
 })();

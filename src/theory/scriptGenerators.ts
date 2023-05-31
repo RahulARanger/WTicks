@@ -53,6 +53,6 @@ export function generate_async_func(name: string, commands: string): string {
 // Generating Immediately Invoked Function Expression (IIFE)
 export function generating_caller_iife(func_names_to_call: string[]): string {
 	return `; (async () => {\n${func_names_to_call
-		.map((_name) => `\t${_name}();`)
+		.map((_name) => `\tawait ${_name}();`)
 		.join("\n")}\n})();`;
 }
