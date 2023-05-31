@@ -46,9 +46,7 @@ describe("Validating the parsed results based on the type of the file uploaded",
 		});
 
 		test("Now we parse the required suite", function () {
-			expect(parser.parseSuite(test_for_test_suite)).toBe(
-				"Assertion for Adding and Removing the Elements"
-			);
+			expect(parser.parseSuite(test_for_test_suite)).toHaveLength(2); // returns the test ids
 		});
 
 		test("While the suite is parsed, the commands are mapped", function () {
@@ -90,9 +88,7 @@ describe("Validating the parsed results based on the type of the file uploaded",
 		});
 
 		test("while the suite is parsed, it will patch all the required commands", function () {
-			expect(parser.parseSuite(test_for_test_suite)).toBe(
-				"Assertion for Adding and Removing the Elements"
-			);
+			expect(parser.parseSuite(test_for_test_suite)).toHaveLength(2); // returns the ids of the test cases
 			const test_case = parser.parsedTestCases[test_for_test_case];
 			expect(test_case?.commands?.at(-1)?.parsed).toBe(
 				"await pageClass.AddOrRemoveElementButton.click();"
@@ -201,6 +197,22 @@ describe("Validating the parsed results based on the type of the file uploaded",
 			const script = parser.genScript(test_case);
 			expect(script).toBe(
 				readExpectation("testWithVariableNameScript.js")
+			);
+		});
+
+		const suite_id = "116e6d91-3b23-4b41-b2f8-f2f507bd7ac8";
+		const inside_tests = [
+			"b8fba4eb-8596-44ba-a748-d8384b8aa598",
+			"a75ae196-3bab-4d1c-b7db-ccd3b331ba6b",
+		];
+
+		test("Generating the script for the entire suite", function () {
+			const tests = parser.parseSuite(suite_id);
+			expect(tests).toEqual(inside_tests);
+
+			const script_generated = parser.genScript(...inside_tests);
+			expect(script_generated).toBe(
+				readExpectation("scenarioGeneratedWithVariableNameScript.js")
 			);
 		});
 	});
