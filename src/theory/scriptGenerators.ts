@@ -21,7 +21,7 @@ export function generateClass(methods: Array<string>): string {
 }
 
 export const imports_required = [
-	'import { remote } from "webdriverio";',
+	'import { remote, Key } from "webdriverio";',
 	'import { expect } from "expect-webdriverio";',
 ].join("\n");
 

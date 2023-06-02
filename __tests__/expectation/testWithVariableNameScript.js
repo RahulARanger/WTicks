@@ -1,4 +1,4 @@
-import { remote } from "webdriverio";
+import { remote, Key } from "webdriverio";
 import { expect } from "expect-webdriverio";
 
 

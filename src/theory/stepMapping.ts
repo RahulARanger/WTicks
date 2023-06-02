@@ -72,6 +72,10 @@ export function mapSteps(
 			return template + `browser.setWindowSize(${width}, ${height});`;
 		}
 
+		case "sendKeys": {
+			return `await browser.keys(${identifyKeys(step.value)});`;
+		}
+
 		// assertions
 
 		case "assertText": {
@@ -184,3 +188,30 @@ export function parseLocators(locator: string): LocationResult {
 		target: location,
 	};
 }
+
+export function identifyKeys(target: string): string {
+	const actual_split = /(?:\$\{KEY_(\w+)\})/g;
+	const test_split = /(\$\{KEY_\w+\})/g;
+
+	const ref = target.split(actual_split).filter((value) => value);
+	return (
+		"[" +
+		target
+			.split(test_split)
+			.filter((value) => value)
+			.map((value, index) => {
+				if (value == ref[index])
+					return JSON.stringify(value.split("")).slice(1, -1);
+				const command = ref[index].toLowerCase();
+				return "Key." + command[0].toUpperCase() + command.slice(1);
+			})
+			.join(",") +
+		"]"
+	);
+}
+
+/**
+ * [ '', 'ENTER', '' ]
+* [ '', '${KEY_ENTER}', '' ]
+comparing both the array gives guarantee that which one is command and which is text we remove "" to avoid extra commas
+ */

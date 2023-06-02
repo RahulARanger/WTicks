@@ -216,4 +216,25 @@ describe("Validating the parsed results based on the type of the file uploaded",
 			);
 		});
 	});
+
+	test("Script Generation with one key command", function () {
+		const parser = new ToStandaloneScript();
+		parser.feed(readMockData("ScrollTest.side"));
+		parser.parseTestCases();
+
+		const patched: { [key: string]: string } = {
+			"#APjFqb": "searchBar",
+			"=2": "_2rdPage",
+			"=4": "_4thPage",
+		};
+
+		Object.keys(patched).forEach((key) => {
+			parser.patchName(key, patched[key]);
+		});
+		const test_case = "8f09a985-8915-4f80-9854-faf7400b028b";
+		expect(parser.patchCommands(test_case).has(test_case)).toBe(true);
+		expect(parser.genScript(test_case)).toBe(
+			readExpectation("scrollScript.js")
+		);
+	});
 });

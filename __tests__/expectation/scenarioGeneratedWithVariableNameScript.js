@@ -1,4 +1,4 @@
-import { remote } from "webdriverio";
+import { remote, Key } from "webdriverio";
 import { expect } from "expect-webdriverio";
 
 
@@ -56,6 +56,7 @@ async function validating_the_search_bar_with_invalid_url() {
 	await pageClass.back_button.click();
 	await pageClass.youtube_search_bar.click();
 	await browser.pause(600);
+	await browser.keys([Key.Enter]);
 	await expect(pageClass.title).toHaveText("YTicks")
 }
 

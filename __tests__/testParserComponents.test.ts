@@ -4,6 +4,7 @@ import {
 	mapSteps,
 	insideQuotes,
 	transitions,
+	identifyKeys,
 } from "../src/theory/stepMapping";
 import { LocationResult, ParsedTestStep } from "../src/theory/sharedTypes";
 import {
@@ -107,6 +108,7 @@ describe("Verifying the helper functions for step mapping", function () {
 		["first word", "first_word"],
 		["0thTest", "_0thTest"],
 		["0.69", "_0_69"],
+		["2ndPage", "_2ndPage"],
 	];
 
 	test.each(verifyNames)(
@@ -246,6 +248,33 @@ describe("Validating the step mappings", function () {
 			},
 			output: "await expect(pageClass.locator_name).not.toBePresent();",
 		},
+		{
+			input: {
+				isLocator: true,
+				command_name: "sendKeys",
+				target: "id=APjFqb",
+				value: "${KEY_ENTER}",
+			},
+			output: "await browser.keys([Key.Enter]);",
+		},
+		{
+			input: {
+				isLocator: false,
+				command_name: "sendKeys",
+				target: "id=APjFqb",
+				value: "${KEY_ENTER}",
+			},
+			output: "await browser.keys([Key.Enter]);", // make sure to add a command to ensure the target has the focus
+		},
+		{
+			input: {
+				isLocator: true,
+				command_name: "sendKeys",
+				target: "id=APjFqb",
+				value: "searched${KEY_ENTER}",
+			},
+			output: 'await browser.keys(["s","e","a","r","c","h","e","d",Key.Enter]);',
+		},
 	];
 
 	test.each<ExpectedStepResult>(tests)(
@@ -313,3 +342,39 @@ describe("Verifying the locator class generated at the end", function () {
 // 1. META DATA
 // 2. Locators Class
 // 3. Block of commands
+
+describe("Verifying the support for the sendKeyCommands", function () {
+	const tests = [
+		{
+			input: "Sample ${KEY_ENTER}",
+			output: '["S","a","m","p","l","e"," ",Key.Enter]',
+		},
+		{
+			input: "",
+			output: "[]",
+		},
+		{
+			input: "plain",
+			output: '["p","l","a","i","n"]',
+		},
+		{
+			input: "${KEY_ENTER}",
+			output: "[Key.Enter]",
+		},
+		{
+			input: "KEY_ENTER",
+			output: '["K","E","Y","_","E","N","T","E","R"]',
+		},
+		{
+			input: "${KEY_CTRL}v${KEY_ENTER}",
+			output: '[Key.Ctrl,"v",Key.Enter]',
+		},
+	];
+
+	test.each(tests)(
+		'Assertion with the Input: "$input"',
+		function ({ input, output }) {
+			expect(identifyKeys(input)).toEqual(output);
+		}
+	);
+});
