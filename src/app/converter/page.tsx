@@ -66,7 +66,7 @@ export default class StandaloneScript extends Component<
 		return (
 			<>
 				<Stack className={uploadFileStyles.normallyInsidePage}>
-					<Header parser={this.state.scriptParser} />
+					<Header />
 					<Stack
 						flexDirection="row"
 						sx={{
@@ -74,7 +74,9 @@ export default class StandaloneScript extends Component<
 							mt: "12px",
 							pl: "6px",
 							pr: "6px",
-							columnGap: "10px",
+							gap: "10px",
+							flexWrap: "wrap",
+							justifyContent: "center",
 						}}
 					>
 						{this.renderForPatching()}

@@ -7,16 +7,12 @@ import { Component, ReactNode } from "react";
 import { motion } from "framer-motion";
 import headerStyles from "@/styles/converter/header.module.sass";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import { CounterIcon } from "./errorsListBox";
-import { ToStandaloneScript } from "@/theory/parser";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Chip } from "@mui/material";
 
-interface ConverterHeaderProps {
-	parser?: ToStandaloneScript;
-}
+interface ConverterHeaderProps {}
 
-interface ConverterState {
-	logs: Array<LogType>;
-}
+interface ConverterState {}
 
 interface LogType {
 	isWarning: boolean;
@@ -44,10 +40,12 @@ export default class Header extends Component<
 
 	renderTools(): ReactNode {
 		return (
-			<Stack flexDirection="row">
-				<CounterIcon
-					onClick={this.showLogs.bind(this)}
-					count={this.state.logs.length}
+			<Stack flexDirection="row" alignItems={"center"} gap="6px">
+				<Chip
+					label="Upload file again"
+					onClick={() => {
+						window.location.reload();
+					}}
 				/>
 				<IconButton href={this.githubURL} target="_blank">
 					<GitHubIcon />
