@@ -25,11 +25,6 @@ const darkTheme = createTheme({
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
-	title: "WTicks",
-	description: "Helper for using WebdriverIO",
-};
-
 export default function RootLayout({
 	children,
 }: {
