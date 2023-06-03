@@ -9,7 +9,7 @@ describe("Validating the parsed results based on the type of the file uploaded",
 	describe("Validating the Script with valid test cases", function () {
 		const parser = new ToStandaloneScript();
 		parser.feed(readMockData("Adding&RemovingElements.side"));
-		parser.parseTestCases();
+		parser.parseAllTestCases();
 
 		test("Validating the locators collected", function () {
 			const locators = Array.from(Object.keys(parser.locators));
@@ -96,7 +96,7 @@ describe("Validating the parsed results based on the type of the file uploaded",
 		});
 	});
 
-	describe("file with some variable names", function () {
+	describe("Verifying the script generation for a particular test case", function () {
 		const parser = new ToStandaloneScript();
 		parser.feed(readMockData("WithVariableNames.side"));
 
@@ -112,25 +112,26 @@ describe("Validating the parsed results based on the type of the file uploaded",
 			".MuiInputAdornment-root > span": "search_bar_icon",
 			".MuiTooltip-tooltip": "tooltip",
 			"#__next": "body",
-			".MuiIconButton-sizeSmall": "search_button",
-			".MuiTypography-h6": "title",
-			".css-xkbv5f": "back_button",
 		};
 
 		test("Parsing must be successful", function () {
 			expect(Object.keys(parser.locators)).toHaveLength(0);
 			expect(Object.keys(parser.parsedTestCases)).toHaveLength(0);
 
-			expect(parser.parseTestCases()).toBe(undefined);
-			// though its output is less informative but internally it did something useful
+			expect(parser.parseTestCases(test_case)).toEqual(
+				new Set(Object.keys(patched_names))
+			);
 
 			// it has parsed the locators
-			expect(Object.keys(parser.locators)).toHaveLength(8);
+			expect(Object.keys(parser.locators)).toHaveLength(5);
+			// Total 8 locators are there but we are specifically requested for a test case so we need to filter it out
 		});
 
 		test("Expecting the test case to be parsed even if some of them are not used in the suite", function () {
 			// it also parses the test cases on high level
-			expect(Object.keys(parser.parsedTestCases)).toHaveLength(2);
+			expect(Object.keys(parser.parsedTestCases)).toHaveLength(1);
+			// we only the test case that we parsed so we based on the previous test case we would need to call the parseAllTestCases to ensure that all are passed
+			// but we would need to support this scenario as well
 			expect(parser.parsedTestCases[test_case].step_name).toBe(
 				"Validating the search bar"
 			);
@@ -144,9 +145,6 @@ describe("Validating the parsed results based on the type of the file uploaded",
 				".MuiInputAdornment-root > span",
 				".MuiTooltip-tooltip",
 				"#__next",
-				".MuiIconButton-sizeSmall",
-				".MuiTypography-h6",
-				".css-xkbv5f",
 			]);
 		});
 
@@ -199,17 +197,49 @@ describe("Validating the parsed results based on the type of the file uploaded",
 				readExpectation("testWithVariableNameScript.js")
 			);
 		});
+	});
 
+	describe("Verifying the script generation for the scenario", function () {
 		const suite_id = "116e6d91-3b23-4b41-b2f8-f2f507bd7ac8";
 		const inside_tests = [
 			"b8fba4eb-8596-44ba-a748-d8384b8aa598",
 			"a75ae196-3bab-4d1c-b7db-ccd3b331ba6b",
 		];
 
-		test("Generating the script for the entire suite", function () {
+		const patched_names: { [key: string]: string } = {
+			"#\\\\:Ril56\\\\:-label": "search_bar_location",
+			"#\\\\:Ril56\\\\:": "youtube_search_bar",
+			".MuiInputAdornment-root > span": "search_bar_icon",
+			".MuiTooltip-tooltip": "tooltip",
+			"#__next": "body",
+			".MuiIconButton-sizeSmall": "search_button",
+			".MuiTypography-h6": "title",
+			".css-xkbv5f": "back_button",
+		};
+
+		const parser = new ToStandaloneScript();
+		parser.feed(readMockData("WithVariableNames.side"));
+
+		test("Parsing the locators", function () {
+			expect(parser.locators).toEqual({});
+			expect(parser.parseSuiteCases(suite_id)).toEqual(
+				new Set(Object.keys(patched_names))
+			);
+		});
+
+		test("Patching the Names", function () {
+			Object.keys(patched_names).forEach((locator) =>
+				parser.patchName(locator, patched_names[locator])
+			);
+			expect(parser.locators).toEqual(patched_names);
+		});
+
+		test("Parsing the Suite", function () {
 			const tests = parser.parseSuite(suite_id);
 			expect(tests).toEqual(inside_tests);
+		});
 
+		test("Generating the script", function () {
 			const script_generated = parser.genScript(...inside_tests);
 			expect(script_generated).toBe(
 				readExpectation("scenarioGeneratedWithVariableNameScript.js")
@@ -220,7 +250,8 @@ describe("Validating the parsed results based on the type of the file uploaded",
 	test("Script Generation with one key command", function () {
 		const parser = new ToStandaloneScript();
 		parser.feed(readMockData("ScrollTest.side"));
-		parser.parseTestCases();
+		const test_case = "8f09a985-8915-4f80-9854-faf7400b028b";
+		parser.parseTestCases(test_case);
 
 		const patched: { [key: string]: string } = {
 			"#APjFqb": "searchBar",
@@ -231,7 +262,6 @@ describe("Validating the parsed results based on the type of the file uploaded",
 		Object.keys(patched).forEach((key) => {
 			parser.patchName(key, patched[key]);
 		});
-		const test_case = "8f09a985-8915-4f80-9854-faf7400b028b";
 		expect(parser.patchCommands(test_case).has(test_case)).toBe(true);
 		expect(parser.genScript(test_case)).toBe(
 			readExpectation("scrollScript.js")

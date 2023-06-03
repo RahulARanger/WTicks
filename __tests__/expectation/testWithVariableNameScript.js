@@ -32,15 +32,6 @@ class Locators {
 	get body() {
 		return this.$("#__next");
 	}
-	get search_button() {
-		return this.$(".MuiIconButton-sizeSmall");
-	}
-	get title() {
-		return this.$(".MuiTypography-h6");
-	}
-	get back_button() {
-		return this.$(".css-xkbv5f");
-	}
 };
 
 

@@ -84,7 +84,11 @@ export class PatchForm extends Component<FormProps, FormState> {
 		});
 
 		this.state.showPendingAlone = requestedLength > 10;
-		this.setState({ ...this.state, selectedOption });
+		this.setState({
+			showPendingAlone: this.state.showPendingAlone,
+			locators: this.state.locators,
+			selectedOption,
+		});
 	}
 
 	genTooltipMessage(): string {

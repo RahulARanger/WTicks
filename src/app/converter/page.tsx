@@ -25,7 +25,7 @@ export default class StandaloneScript extends Component<
 		if (!parser.isValidFile())
 			throw new Error("Uploaded file is not a valid file");
 
-		parser.parseTestCases();
+		parser.parseAllTestCases();
 		this.setState({ scriptParser: parser });
 	}
 
@@ -67,7 +67,9 @@ export default class StandaloneScript extends Component<
 			<SimpleScriptViewer
 				language={languages.javascript}
 				languageString="javascript"
-				script={'console.info("Generating ...");'}
+				script={
+					'console.info("Please complete the required info for generating the script ...");'
+				}
 			/>
 		);
 	}

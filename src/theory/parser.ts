@@ -142,7 +142,9 @@ abstract class GeneralizeVariable {
 			const result = this.parseTestStep(command);
 			if (!result) continue;
 			commands.push(result);
-			locatorsEncountered && locatorsEncountered.add(result.target);
+			result.isLocator &&
+				locatorsEncountered &&
+				locatorsEncountered.add(result.target);
 		}
 
 		this.parsedTestCases[testCase.id] = {
