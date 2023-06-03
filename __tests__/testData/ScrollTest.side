@@ -107,6 +107,13 @@
           "value": ""
         },
         {
+          "command": "waitForElementVisible",
+          "target": "linkText=2",
+          "value": "3000",
+          "id": "08c3a9f3-bd2b-4aa9-b973-a913ff724f5f",
+          "comment": "Let's wait before clicking on the element"
+        },
+        {
           "id": "ba323631-f190-43f7-95fa-631fef9b813d",
           "comment": "",
           "command": "click",

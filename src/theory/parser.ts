@@ -135,11 +135,14 @@ abstract class GeneralizeVariable {
 		};
 	}
 
-	parseTestCase(testCase: Test) {
+	parseTestCase(testCase: Test, locatorsEncountered?: Set<string>) {
 		const commands = [];
+
 		for (let command of testCase.commands) {
 			const result = this.parseTestStep(command);
-			if (result) commands.push(result);
+			if (!result) continue;
+			commands.push(result);
+			locatorsEncountered && locatorsEncountered.add(result.target);
 		}
 
 		this.parsedTestCases[testCase.id] = {
@@ -166,9 +169,27 @@ abstract class GeneralizeVariable {
 		return suite.tests;
 	}
 
-	parseTestCases() {
-		const tests = this.parsed?.tests || [];
-		tests.forEach(this.parseTestCase.bind(this));
+	parseAllTestCases() {
+		return this.parsed?.tests.forEach((test_case) =>
+			this.parseTestCase(test_case)
+		);
+	}
+
+	parseTestCases(..._test_ids: string[]): Set<string> {
+		const test_ids = new Set(_test_ids);
+
+		const result: Set<string> = new Set();
+		this.parsed?.tests
+			.filter((test) => test_ids.has(test.id))
+			.forEach((test_case) => this.parseTestCase(test_case, result));
+
+		return result;
+	}
+
+	parseSuiteCases(suite_id: string): Set<string> {
+		const suite = this.fetchSuite(suite_id);
+		if (!suite) return new Set(); // this won't happen from UI as we select from the options
+		return this.parseTestCases(...suite.tests);
 	}
 
 	isValidFile(): boolean {
@@ -176,22 +197,7 @@ abstract class GeneralizeVariable {
 	}
 }
 
-export abstract class Listener extends GeneralizeVariable {
-	parseTestCase(testCase: Test) {
-		super.parseTestCase(testCase);
-		this.dispatcher &&
-			this.dispatcher({
-				type: "parsedTestCase",
-				result: testCase.name,
-			});
-	}
-
-	parseTestCases(): void {
-		super.parseTestCases();
-		this.dispatcher &&
-			this.dispatcher({ type: "parsedTestCases", result: "" });
-	}
-}
+export abstract class Listener extends GeneralizeVariable {}
 
 export class ToStandaloneScript extends Listener {
 	frameWorkType: string = "Standalone";

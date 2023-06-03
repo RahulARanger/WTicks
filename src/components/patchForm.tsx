@@ -1,35 +1,26 @@
-import { Component, RefObject, createRef } from "react";
+import { Component, SyntheticEvent } from "react";
 import { ToStandaloneScript, test_var_name } from "@/theory/parser";
-import { alpha, styled } from "@mui/material/styles";
 import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
 import StepButton from "@mui/material/StepButton";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import MenuItem from "@mui/material/MenuItem";
 import ListSubheader from "@mui/material/ListSubheader";
-import Select from "@mui/material/Select";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import formStyles from "@/styles/form.module.sass";
-import Drawer from "@mui/material/Drawer";
 import InputTextField from "./inputElement";
-import {
-	Divider,
-	Skeleton,
-	TextField,
-	Tooltip,
-	Typography,
-} from "@mui/material";
+import { motion, AnimatePresence } from "framer-motion";
+import { Chip, Divider, Tooltip, Typography } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
-import { ParsedTestCase, TestSuite } from "@/theory/sharedTypes";
+import InfoBox from "./infoBox";
+import { arise_from_bottom } from "@/motion/transactions";
 
-interface InputStatus {
+export interface InputStatus {
 	text: string;
 	isError?: boolean;
 }
@@ -40,16 +31,17 @@ interface FormState {
 	goodToGenerate: boolean;
 	error?: string;
 	selectedOption?: null | OptionType;
-	activeStep: number;
 }
 
 interface FormProps {
 	parser: ToStandaloneScript;
-	showDrawer: boolean;
-	closeDrawer: () => void;
+	// toGenerate: (
+	// 	selected_type: OptionType,
+	// 	locators: { [key: string]: InputStatus }
+	// ) => void;
 }
 
-interface OptionType {
+export interface OptionType {
 	is_suite: boolean;
 	label: string;
 	value: string;
@@ -59,26 +51,9 @@ export class PatchForm extends Component<FormProps, FormState> {
 	state: FormState = {
 		showPendingAlone: false,
 		locators: {},
-		activeStep: 0,
 		goodToGenerate: false,
 		error: "",
 	};
-
-	constructor(props: FormProps) {
-		super(props);
-
-		const requestedLength = Object.keys(this.state.locators).length;
-
-		for (let locator of Object.keys(props.parser.locators)) {
-			const requested = this.parser().locators[locator];
-			this.state.locators[locator] = {
-				text: requested,
-				isError: !test_var_name.test(requested),
-			};
-		}
-
-		this.state.showPendingAlone = requestedLength > 10;
-	}
 	// HELPER METHODS
 	parser() {
 		return this.props.parser;
@@ -88,13 +63,36 @@ export class PatchForm extends Component<FormProps, FormState> {
 		return Boolean(this.state.goodToGenerate && this.state.selectedOption);
 	}
 
+	parseTestCases(
+		_: SyntheticEvent<Element, Event>,
+		selectedOption: OptionType | null
+	) {
+		if (!selectedOption) return this.setState({ selectedOption });
+
+		const parser = this.parser();
+		const locators = selectedOption.is_suite
+			? parser.parseSuiteCases(selectedOption.value)
+			: parser.parseTestCases(selectedOption.value);
+		const requestedLength = locators.size;
+
+		locators.forEach((locator) => {
+			const requested = parser.locators[locator];
+			this.state.locators[locator] = {
+				text: requested,
+				isError: !test_var_name.test(requested),
+			};
+		});
+
+		this.state.showPendingAlone = requestedLength > 10;
+		this.setState({ ...this.state, selectedOption });
+	}
+
 	genTooltipMessage(): string {
 		return this.state.goodToGenerate && this.state.selectedOption
 			? "Generate Script"
-			: this.state.error ||
-					(!this.state.selectedOption
-						? "Please select the test component"
-						: "Please verify before generating");
+			: (!this.state.selectedOption
+					? "Please select the test component"
+					: "Please verify before generating") || this.state.error;
 	}
 
 	// validation or state changer methods
@@ -154,43 +152,14 @@ export class PatchForm extends Component<FormProps, FormState> {
 				: isThereError
 				? "Please rectify the error before verifying it"
 				: this.genTooltipMessage(),
-			showPendingAlone: isThereDuplicate
-				? true
-				: this.state.showPendingAlone,
+			showPendingAlone:
+				isThereDuplicate || isThereError
+					? true
+					: this.state.showPendingAlone,
 		});
 	}
 
-	renderSteps() {
-		const labels = ["Assigning Names"];
-		// "Script Configuration" is work in progress
-
-		return (
-			<Stepper nonLinear activeStep={this.state.activeStep}>
-				<>
-					{labels.map((label, index) => {
-						return (
-							<Step
-								index={index}
-								key={label}
-								completed={this.didUserComplete()}
-								disabled={index !== 0}
-							>
-								<StepButton
-									onClick={() =>
-										this.setState({ activeStep: index })
-									}
-								>
-									{label}
-								</StepButton>
-							</Step>
-						);
-					})}
-				</>
-			</Stepper>
-		);
-	}
-
-	renderOptions() {
+	renderMenuOptions(required?: boolean) {
 		const suites = this.parser().parsed?.suites || [];
 		const test_cases = Object.values(this.parser().parsedTestCases);
 
@@ -231,9 +200,10 @@ export class PatchForm extends Component<FormProps, FormState> {
 						sx={{ border: "1.5px solid black" }}
 					/>
 				)}
-				onChange={(_, value) =>
-					this.setState({ selectedOption: value })
-				}
+				onChange={this.parseTestCases.bind(this)}
+				open={required}
+				forcePopupIcon={required ? false : undefined}
+				value={this.state.selectedOption}
 			/>
 		);
 	}
@@ -264,24 +234,49 @@ export class PatchForm extends Component<FormProps, FormState> {
 					}
 				/>
 				<List className={formStyles.listContainer}>
-					{filtered.map((locator) => {
-						return (
-							<ListItem key={locator} disableGutters>
-								<InputTextField
-									label={locator}
-									defaultValue={locators[locator]}
-									required
-									placeholder="Not yet decided"
-									regexToMaintain={test_var_name}
-									sx={{ width: "100%" }}
-									value={this.state.locators[locator].text}
-									afterValidation={this.identifyUnsavedChanges.bind(
-										this
-									)}
-								/>
-							</ListItem>
-						);
-					})}
+					<AnimatePresence>
+						<>
+							{filtered.map((locator) => {
+								return (
+									<motion.div
+										key={locator}
+										initial={{ opacity: 0, x: -10 }}
+										animate={{ opacity: 1, x: 0 }}
+										exit={{
+											opacity: 0,
+											scale: 0.5,
+											transition: { duration: 0.2 },
+										}}
+										transition={{ duration: 0.5 }}
+										whileHover={{
+											scale: 1.02,
+											transition: {
+												duration: 0.2,
+												type: "spring",
+											},
+										}}
+									>
+										<ListItem disableGutters>
+											<InputTextField
+												label={locator}
+												required
+												placeholder="Not yet decided"
+												regexToMaintain={test_var_name}
+												sx={{ width: "100%" }}
+												value={
+													this.state.locators[locator]
+														.text
+												}
+												afterValidation={this.identifyUnsavedChanges.bind(
+													this
+												)}
+											/>
+										</ListItem>
+									</motion.div>
+								);
+							})}
+						</>
+					</AnimatePresence>
 				</List>
 			</>
 		);
@@ -293,16 +288,15 @@ export class PatchForm extends Component<FormProps, FormState> {
 				{hasLocators ? (
 					this.renderListItems()
 				) : (
-					<Typography
-						variant="h6"
-						color="paleturquoise"
-						alignItems="center"
-						flexGrow={1}
-						sx={{ display: "flex" }}
-						alignSelf="center"
-					>
-						No Locators found
-					</Typography>
+					<InfoBox>
+						<Chip
+							label={
+								<Typography color="paleturquoise">
+									No Locators found
+								</Typography>
+							}
+						/>
+					</InfoBox>
 				)}
 			</>
 		);
@@ -311,7 +305,7 @@ export class PatchForm extends Component<FormProps, FormState> {
 	askForLocators(hasLocators: boolean) {
 		return (
 			<>
-				{this.renderOptions()}
+				{this.renderMenuOptions()}
 				<Typography variant="subtitle1" sx={{ alignSelf: "stretch" }}>
 					Please fill the names of the locators.
 					<Divider variant="fullWidth" />
@@ -321,96 +315,56 @@ export class PatchForm extends Component<FormProps, FormState> {
 		);
 	}
 
-	// TODO: work in progress
-	askIfNeededMore() {
-		const details: string[] = [];
-
-		const selected = this.state.selectedOption;
-		if (!selected || selected === null) return <></>;
-
-		if (selected.is_suite) {
-			const test_cases = this.parser().fetchSuite(selected.value);
-			if (!test_cases) return <></>;
-			details.push(
-				...test_cases.tests.map(
-					(test_id) =>
-						this.parser().parsedTestCases[test_id].step_name
-				)
-			);
-		} else details.push(this.state?.selectedOption?.value || "");
-
-		return selected.is_suite ? (
-			<List
-				className={formStyles.listContainer}
-				subheader={
-					<ListSubheader>
-						{selected.is_suite
-							? "Test Cases in suite"
-							: "Test Case selected"}
-					</ListSubheader>
-				}
-			>
-				<>
-					{details.map((item) => {
-						return <ListItem key={item}>{item}</ListItem>;
-					})}
-				</>
-			</List>
-		) : (
-			<Typography>Selected Test Case:</Typography>
-		);
-	}
-
 	renderForm() {
 		const locators = this.props.parser.locators;
 		const savedLength = Object.keys(locators).length;
 		const hasLocators = savedLength > 0;
+		const message = this.genTooltipMessage();
 
 		return (
-			<FormControl className={formStyles.formBox}>
-				<>
-					{this.renderSteps()}
-					{this.state.activeStep === 0
-						? this.askForLocators(hasLocators)
-						: this.askIfNeededMore()}
-					<Stack flexDirection="row" columnGap={"12px"}>
-						{hasLocators ? (
+			<>
+				{this.askForLocators(hasLocators)}
+				<Stack flexDirection="row" columnGap={"12px"}>
+					{hasLocators ? (
+						<Button
+							variant="outlined"
+							color="secondary"
+							onClick={this.verifySelection.bind(this)}
+						>
+							Verify
+						</Button>
+					) : (
+						<></>
+					)}
+					<Tooltip
+						title={
+							<Typography color="lightyellow" variant="caption">
+								{message}
+							</Typography>
+						}
+						arrow
+						open={!!message}
+					>
+						<span>
 							<Button
 								variant="outlined"
-								color="secondary"
-								onClick={this.verifySelection.bind(this)}
+								disabled={
+									!this.state.selectedOption ||
+									!this.state.goodToGenerate
+								}
 							>
-								Verify
+								Generate
 							</Button>
-						) : (
-							<></>
-						)}
-						<Tooltip title={this.genTooltipMessage()}>
-							<span>
-								<Button
-									variant="outlined"
-									disabled={
-										!this.state.selectedOption ||
-										!this.state.goodToGenerate
-									}
-								>
-									Generate
-								</Button>
-							</span>
-						</Tooltip>
-					</Stack>
-				</>
-			</FormControl>
+						</span>
+					</Tooltip>
+				</Stack>
+			</>
 		);
 	}
 
 	render() {
 		return (
-			<Drawer
-				anchor="left"
-				open={this.props.showDrawer}
-				onClose={this.props.closeDrawer}
-			>
+			<motion.article layout>
 				<Paper
 					sx={{
 						p: "6px",
@@ -419,10 +373,21 @@ export class PatchForm extends Component<FormProps, FormState> {
 						rowGap: "12px",
 						height: "100%",
 					}}
+					elevation={2}
 				>
-					{this.renderForm()}
+					<FormControl style={{ height: "100%" }}>
+						<motion.span
+							className={formStyles.formBox}
+							layout
+							style={{ height: "100%" }}
+						>
+							{!this.state.selectedOption
+								? this.renderMenuOptions(true)
+								: this.renderForm()}
+						</motion.span>
+					</FormControl>
 				</Paper>
-			</Drawer>
+			</motion.article>
 		);
 	}
 }

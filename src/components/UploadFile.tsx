@@ -12,6 +12,7 @@ import Skeleton from "@mui/material/Skeleton";
 import Alert from "@mui/material/Alert";
 import uploadFileStyles from "@/styles/uploadFile.module.sass";
 import { motion } from "framer-motion";
+import { eye_raise, tilt_head } from "@/motion/whileHover";
 
 export default class UploadFile extends Component<
 	FileUploadProps,
@@ -57,8 +58,9 @@ export default class UploadFile extends Component<
 					<motion.label
 						htmlFor={this.uploadID}
 						whileHover={{
-							scale: 1.069,
-							border: "4px dotted white",
+							...tilt_head,
+							...eye_raise,
+							border: "3px dotted white",
 						}}
 						transition={{
 							type: "spring",
