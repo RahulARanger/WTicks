@@ -192,7 +192,10 @@ describe("Validating the parsed results based on the type of the file uploaded",
 		});
 
 		test("Generating the script required for the test case", function () {
-			const script = parser.genScript(test_case);
+			const script = parser.genScript(
+				Object.keys(patched_names),
+				test_case
+			);
 			expect(script).toBe(
 				readExpectation("testWithVariableNameScript.js")
 			);
@@ -239,11 +242,37 @@ describe("Validating the parsed results based on the type of the file uploaded",
 			expect(tests).toEqual(inside_tests);
 		});
 
-		test("Generating the script", function () {
-			const script_generated = parser.genScript(...inside_tests);
+		test("verifying the script generation and ensuring that it only depends on the external locators but not its internal ones", function () {
+			// parser has its locators which is vast compared to the locators that UI could request which is restricted to the particular test case / suite
+			// as long as UI sends valid locators we should not generate locator class for all unused locators
+
+			const script_generated = parser.genScript(
+				Object.keys(patched_names),
+				...inside_tests
+			);
 			expect(script_generated).toBe(
 				readExpectation("scenarioGeneratedWithVariableNameScript.js")
 			);
+
+			parser.locators["dummy"] = "dummy";
+
+			expect(script_generated).toBe(
+				readExpectation("scenarioGeneratedWithVariableNameScript.js")
+			);
+		});
+
+		test("Verifying the script generation are really dependent on the external locators", function () {
+			patched_names["dummy"] = "dummy";
+			const script_generated = parser.genScript(
+				Object.keys(patched_names),
+				...inside_tests
+			);
+
+			expect(script_generated).not.toBe(
+				readExpectation("scenarioGeneratedWithVariableNameScript.js")
+			);
+
+			delete patched_names["dummy"];
 		});
 
 		test("Verifying if the parseAll is working as expected or not", function () {
@@ -274,7 +303,7 @@ describe("Validating the parsed results based on the type of the file uploaded",
 			parser.patchName(key, patched[key]);
 		});
 		expect(parser.patchCommands(test_case).has(test_case)).toBe(true);
-		expect(parser.genScript(test_case)).toBe(
+		expect(parser.genScript(Object.keys(patched), test_case)).toBe(
 			readExpectation("scrollScript.js")
 		);
 	});

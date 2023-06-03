@@ -54,7 +54,10 @@ export default class StandaloneScript extends Component<
 		else test_cases = parser.patchCommands(selectedOption.value);
 
 		this.setState({
-			scriptGenerated: parser.genScript(...Array.from(test_cases || [])),
+			scriptGenerated: parser.genScript(
+				Object.keys(locators),
+				...Array.from(test_cases || [])
+			),
 		});
 	}
 

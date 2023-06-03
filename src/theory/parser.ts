@@ -47,15 +47,6 @@ abstract class GeneralizeVariable {
 		if (this.func_names.has(purified)) return this.generate_name(false);
 		return purified;
 	}
-
-	generateLocatorClass(): string {
-		return generateClass(
-			Object.keys(this.locators).map((key) =>
-				generateClassMethod(this.locators[key], key)
-			)
-		);
-	}
-
 	patchCommands(...test_ids: Array<string>): Set<string> {
 		const ids = new Set(test_ids);
 		ids.forEach((test_id) => {
@@ -204,7 +195,7 @@ export abstract class Listener extends GeneralizeVariable {}
 export class ToStandaloneScript extends Listener {
 	frameWorkType: string = "Standalone";
 
-	genScript(...test_case_ids: string[]): string {
+	genScript(locators: string[], ...test_case_ids: string[]): string {
 		const func_names: string[] = [];
 
 		const tests = test_case_ids.map((test_case_id) => {
@@ -221,7 +212,11 @@ export class ToStandaloneScript extends Listener {
 		return [
 			imports_required,
 			browser_options,
-			this.generateLocatorClass(),
+			generateClass(
+				locators.map((key) =>
+					generateClassMethod(this.locators[key], key)
+				)
+			),
 			"const pageClass = new Locators();",
 			...tests,
 			generating_caller_iife([...func_names, "browser.deleteSession"]),
