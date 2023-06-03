@@ -9,11 +9,11 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import formStyles from "@/styles/form.module.sass";
-import InputTextField from "./inputElement";
+import InputTextField from "../userInput/inputElement";
 import { motion, AnimatePresence } from "framer-motion";
 import { Chip, Divider, Tooltip, Typography } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
-import InfoBox from "./infoBox";
+import InfoBox from "../infoBox";
 // import { arise_from_bottom } from "@/motion/transactions";
 
 export interface InputStatus {

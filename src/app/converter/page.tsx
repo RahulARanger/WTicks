@@ -1,6 +1,6 @@
 "use client";
 import { Component, ReactNode } from "react";
-import UploadFile from "@/components/UploadFile";
+import UploadFile from "@/components/userInput/UploadFile";
 import {
 	StandAloneScriptProps,
 	StandAloneScriptState,
@@ -8,9 +8,13 @@ import {
 import { ToStandaloneScript } from "@/theory/parser";
 import Header from "@/components/header";
 import Stack from "@mui/material/Stack";
-import SimpleScriptViewer from "@/components/textArea";
+import SimpleScriptViewer from "@/components/userInput/textArea";
 import uploadFileStyles from "@/styles/uploadFile.module.sass";
-import { InputStatus, OptionType, PatchForm } from "@/components/patchForm";
+import {
+	InputStatus,
+	OptionType,
+	PatchForm,
+} from "@/components/converter/patchForm";
 import { languages } from "prismjs";
 
 export default class StandaloneScript extends Component<
