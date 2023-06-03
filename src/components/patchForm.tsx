@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Chip, Divider, Tooltip, Typography } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import InfoBox from "./infoBox";
-import { arise_from_bottom } from "@/motion/transactions";
+// import { arise_from_bottom } from "@/motion/transactions";
 
 export interface InputStatus {
 	text: string;

@@ -5,7 +5,7 @@ import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
 import { Component, ReactNode } from "react";
 import { motion } from "framer-motion";
-import headerStyles from "@/styles/header.module.sass";
+import headerStyles from "@/styles/converter/header.module.sass";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import { CounterIcon } from "./errorsListBox";
 import { ToStandaloneScript } from "@/theory/parser";

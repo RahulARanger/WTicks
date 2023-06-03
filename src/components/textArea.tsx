@@ -3,10 +3,13 @@ import Paper from "@mui/material/Paper";
 import { Grammar, highlight } from "prismjs";
 import "prismjs/themes/prism-tomorrow.css"; // Import the desired Prism theme CSS file
 import "prismjs/components/prism-javascript";
-import textAreaStyles from "@/styles/textArea.module.sass";
-import { IconButton, Stack, Toolbar, Typography } from "@mui/material";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import textAreaStyles from "@/styles/converter/textArea.module.sass";
+// import IconButton from "@mui/material/IconButton";
+// import Toolbar from "@mui/material/Toolbar";
+// import Typography from "@mui/material/Typography";
+// import Stack from "@mui/material/Stack";
+// import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+// import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import Snackbar from "@mui/material/Snackbar";
 import { motion } from "framer-motion";
 import Alert from "@mui/material/Alert";
