@@ -1,15 +1,11 @@
-import { Component, SyntheticEvent } from "react";
+import { Component } from "react";
 import { ToStandaloneScript, test_var_name } from "@/theory/parser";
 import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepButton from "@mui/material/StepButton";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import ListSubheader from "@mui/material/ListSubheader";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import formStyles from "@/styles/form.module.sass";
@@ -35,10 +31,10 @@ interface FormState {
 
 interface FormProps {
 	parser: ToStandaloneScript;
-	// toGenerate: (
-	// 	selected_type: OptionType,
-	// 	locators: { [key: string]: InputStatus }
-	// ) => void;
+	toGenerate: (
+		selected_type: OptionType,
+		locators: { [key: string]: InputStatus }
+	) => void;
 }
 
 export interface OptionType {
@@ -63,32 +59,30 @@ export class PatchForm extends Component<FormProps, FormState> {
 		return Boolean(this.state.goodToGenerate && this.state.selectedOption);
 	}
 
-	parseTestCases(
-		_: SyntheticEvent<Element, Event>,
-		selectedOption: OptionType | null
-	) {
-		if (!selectedOption) return this.setState({ selectedOption });
-
+	parseTestCases(selectedOption: OptionType) {
 		const parser = this.parser();
 		const locators = selectedOption.is_suite
 			? parser.parseSuiteCases(selectedOption.value)
 			: parser.parseTestCases(selectedOption.value);
+
 		const requestedLength = locators.size;
+		const locators_to_be_state: { [key: string]: InputStatus } = {};
 
 		locators.forEach((locator) => {
 			const requested = parser.locators[locator];
-			this.state.locators[locator] = {
+			locators_to_be_state[locator] = {
 				text: requested,
 				isError: !test_var_name.test(requested),
 			};
 		});
 
-		this.state.showPendingAlone = requestedLength > 10;
 		this.setState({
-			showPendingAlone: this.state.showPendingAlone,
-			locators: this.state.locators,
+			showPendingAlone: requestedLength > 10,
+			locators: locators_to_be_state,
 			selectedOption,
 		});
+
+		console.log(this.state.locators);
 	}
 
 	genTooltipMessage(): string {
@@ -204,7 +198,10 @@ export class PatchForm extends Component<FormProps, FormState> {
 						sx={{ border: "1.5px solid black" }}
 					/>
 				)}
-				onChange={this.parseTestCases.bind(this)}
+				onChange={(_, value) => {
+					if (value) return this.parseTestCases(value);
+					this.setState({ selectedOption: value });
+				}}
 				open={required}
 				forcePopupIcon={required ? false : undefined}
 				value={this.state.selectedOption}
@@ -213,7 +210,7 @@ export class PatchForm extends Component<FormProps, FormState> {
 	}
 
 	renderListItems() {
-		const locators = this.parser().locators;
+		const locators = this.state.locators;
 		const filtered = Object.keys(locators).filter((locator) =>
 			this.state.showPendingAlone
 				? this.state.locators[locator].isError
@@ -238,11 +235,12 @@ export class PatchForm extends Component<FormProps, FormState> {
 					}
 				/>
 				<List className={formStyles.listContainer}>
-					<AnimatePresence>
+					<AnimatePresence mode="popLayout">
 						<>
 							{filtered.map((locator) => {
 								return (
 									<motion.div
+										layout
 										key={locator}
 										initial={{ opacity: 0, x: -10 }}
 										animate={{ opacity: 1, x: 0 }}
@@ -355,6 +353,13 @@ export class PatchForm extends Component<FormProps, FormState> {
 								disabled={
 									!this.state.selectedOption ||
 									!this.state.goodToGenerate
+								}
+								onClick={() =>
+									this.state.selectedOption &&
+									this.props.toGenerate(
+										this.state.selectedOption,
+										this.state.locators
+									)
 								}
 							>
 								Generate

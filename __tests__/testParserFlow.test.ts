@@ -245,6 +245,17 @@ describe("Validating the parsed results based on the type of the file uploaded",
 				readExpectation("scenarioGeneratedWithVariableNameScript.js")
 			);
 		});
+
+		test("Verifying if the parseAll is working as expected or not", function () {
+			parser.locators = {}; //mocking reset
+			expect(Object.keys(parser.locators)).not.toEqual(
+				Object.keys(patched_names)
+			);
+			parser.parseAllTestCases();
+			expect(Object.keys(parser.locators)).toEqual(
+				Object.keys(patched_names)
+			);
+		});
 	});
 
 	test("Script Generation with one key command", function () {

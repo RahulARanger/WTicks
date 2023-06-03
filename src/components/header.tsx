@@ -7,10 +7,32 @@ import { Component, ReactNode } from "react";
 import { motion } from "framer-motion";
 import headerStyles from "@/styles/header.module.sass";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import { Skeleton } from "@mui/material";
+import { CounterIcon } from "./errorsListBox";
+import { ToStandaloneScript } from "@/theory/parser";
 
-export default class Header extends Component<{ suites?: Array<string> }> {
+interface ConverterHeaderProps {
+	parser?: ToStandaloneScript;
+}
+
+interface ConverterState {
+	logs: Array<LogType>;
+}
+
+interface LogType {
+	isWarning: boolean;
+	text: boolean;
+}
+
+export default class Header extends Component<
+	ConverterHeaderProps,
+	ConverterState
+> {
 	githubURL = "https://github.com/RahulARanger/wticks";
+	state: ConverterState = { logs: [] };
+
+	showLogs() {
+		return <></>;
+	}
 
 	renderTitle(): ReactNode {
 		return (
@@ -20,20 +42,20 @@ export default class Header extends Component<{ suites?: Array<string> }> {
 		);
 	}
 
-	selectSuites(): ReactNode {
-		return this.props.suites ? <></> : <Skeleton width="100px" />;
-	}
-
 	renderTools(): ReactNode {
 		return (
 			<Stack flexDirection="row">
-				{this.selectSuites()}
+				<CounterIcon
+					onClick={this.showLogs.bind(this)}
+					count={this.state.logs.length}
+				/>
 				<IconButton href={this.githubURL} target="_blank">
 					<GitHubIcon />
 				</IconButton>
 			</Stack>
 		);
 	}
+
 	render(): ReactNode {
 		return (
 			<motion.div layout>

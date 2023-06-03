@@ -8,8 +8,10 @@ import { IconButton, Stack, Toolbar, Typography } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import Snackbar from "@mui/material/Snackbar";
+import { motion } from "framer-motion";
 import Alert from "@mui/material/Alert";
 import "prismjs/components/prism-json";
+import { arise_from_bottom } from "@/motion/transactions";
 
 interface LineNumberState {
 	copied: boolean;
@@ -54,54 +56,44 @@ export default class SimpleScriptViewer extends Component<
 		const closeSnack = this.closeSnack.bind(this);
 
 		return (
-			<Paper elevation={1} className={textAreaStyles.textArea}>
-				<Toolbar className={textAreaStyles.toolBar}>
-					<Stack
-						justifyContent={"space-between"}
-						flexDirection="row"
-						alignItems="center"
-						sx={{ width: "100%" }}
-					>
-						<Stack flexDirection="row">
-							<IconButton onClick={this.copyScript.bind(this)}>
-								<ContentCopyIcon />
-							</IconButton>
-							<IconButton
-								onClick={this.downloadScript.bind(this)}
-							>
-								<FileDownloadIcon />
-							</IconButton>
-						</Stack>
-					</Stack>
-				</Toolbar>
-				<pre>
-					<code
-						dangerouslySetInnerHTML={{
-							__html: highlight(
-								this.props.script,
-								this.props.language,
-								this.props.languageString
-							),
-						}}
-						className={`language-${this.props.languageString} line-numbers`}
-					></code>
-				</pre>
-				<Snackbar
-					open={this.state.copied}
-					autoHideDuration={3000}
-					onClose={closeSnack}
-					color="info"
-					anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-				>
-					<Alert
+			<Paper
+				elevation={1}
+				className={textAreaStyles.textArea}
+				sx={{ flexGrow: 1 }}
+			>
+				<motion.div {...arise_from_bottom} layout>
+					<pre className={textAreaStyles.preCode}>
+						<code
+							dangerouslySetInnerHTML={{
+								__html: highlight(
+									this.props.script,
+									this.props.language,
+									this.props.languageString
+								),
+							}}
+							className={`language-${this.props.languageString} ${textAreaStyles.script}`}
+						></code>
+					</pre>
+					<Snackbar
+						open={this.state.copied}
+						autoHideDuration={3000}
 						onClose={closeSnack}
-						severity="info"
 						color="info"
-						sx={{ width: "100%" }}
+						anchorOrigin={{
+							vertical: "bottom",
+							horizontal: "right",
+						}}
 					>
-						Copied to clipboard
-					</Alert>
-				</Snackbar>
+						<Alert
+							onClose={closeSnack}
+							severity="info"
+							color="info"
+							sx={{ width: "100%" }}
+						>
+							Copied to clipboard
+						</Alert>
+					</Snackbar>
+				</motion.div>
 			</Paper>
 		);
 	}

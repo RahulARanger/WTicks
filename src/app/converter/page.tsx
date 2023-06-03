@@ -10,14 +10,17 @@ import Header from "@/components/header";
 import Stack from "@mui/material/Stack";
 import SimpleScriptViewer from "@/components/textArea";
 import uploadFileStyles from "@/styles/uploadFile.module.sass";
-import { PatchForm } from "@/components/patchForm";
+import { InputStatus, OptionType, PatchForm } from "@/components/patchForm";
 import { languages } from "prismjs";
 
 export default class StandaloneScript extends Component<
 	StandAloneScriptProps,
 	StandAloneScriptState
 > {
-	state: StandAloneScriptState = {};
+	state: StandAloneScriptState = {
+		scriptGenerated:
+			'console.info("Please complete the required info for generating the script ...");',
+	};
 
 	async parseRaw(data: string) {
 		const parser = new ToStandaloneScript();
@@ -29,6 +32,28 @@ export default class StandaloneScript extends Component<
 		this.setState({ scriptParser: parser });
 	}
 
+	toGenerate(
+		selectedOption: OptionType,
+		locators: { [key: string]: InputStatus }
+	) {
+		const parser = this.state.scriptParser;
+		if (!parser) return;
+
+		Object.keys(locators).forEach((locator) => {
+			if (!locators[locator]?.isError)
+				parser.patchName(locator, locators[locator].text);
+		});
+
+		let test_cases;
+		if (selectedOption.is_suite)
+			test_cases = parser.parseSuite(selectedOption.value);
+		else test_cases = parser.patchCommands(selectedOption.value);
+
+		this.setState({
+			scriptGenerated: parser.genScript(...Array.from(test_cases || [])),
+		});
+	}
+
 	renderIfNotUploaded(): ReactNode {
 		return <UploadFile dispatchDetails={this.parseRaw.bind(this)} />;
 	}
@@ -37,7 +62,7 @@ export default class StandaloneScript extends Component<
 		return (
 			<>
 				<Stack className={uploadFileStyles.normallyInsidePage}>
-					<Header />
+					<Header parser={this.state.scriptParser} />
 					<Stack
 						flexDirection="row"
 						sx={{
@@ -58,7 +83,12 @@ export default class StandaloneScript extends Component<
 
 	renderForPatching(): ReactNode {
 		if (this.state.scriptParser)
-			return <PatchForm parser={this.state.scriptParser} />;
+			return (
+				<PatchForm
+					parser={this.state.scriptParser}
+					toGenerate={this.toGenerate.bind(this)}
+				/>
+			);
 		return <></>;
 	}
 
@@ -67,9 +97,7 @@ export default class StandaloneScript extends Component<
 			<SimpleScriptViewer
 				language={languages.javascript}
 				languageString="javascript"
-				script={
-					'console.info("Please complete the required info for generating the script ...");'
-				}
+				script={this.state.scriptGenerated}
 			/>
 		);
 	}
