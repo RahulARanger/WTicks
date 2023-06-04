@@ -6,15 +6,16 @@ import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
 import formStyles from "@/styles/form.module.sass";
 import InputTextField from "../userInput/inputElement";
 import { motion, AnimatePresence } from "framer-motion";
-import { Chip, Divider, Tooltip, Typography } from "@mui/material";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import Chip from "@mui/material/Chip";
+import Tooltip from "@mui/material/Tooltip";
 import Autocomplete from "@mui/material/Autocomplete";
 import InfoBox from "../infoBox";
-// import { arise_from_bottom } from "@/motion/transactions";
+import WListItem, { WList } from "../list";
 
 export interface InputStatus {
 	text: string;
@@ -234,52 +235,29 @@ export class PatchForm extends Component<FormProps, FormState> {
 						/>
 					}
 				/>
-				<List className={formStyles.listContainer}>
-					<AnimatePresence mode="popLayout">
-						<>
-							{filtered.map((locator) => {
-								return (
-									<motion.div
-										layout
-										key={locator}
-										initial={{ opacity: 0, x: -10 }}
-										animate={{ opacity: 1, x: 0 }}
-										exit={{
-											opacity: 0,
-											scale: 0.5,
-											transition: { duration: 0.2 },
-										}}
-										transition={{ duration: 0.5 }}
-										whileHover={{
-											scale: 1.02,
-											transition: {
-												duration: 0.2,
-												type: "spring",
-											},
-										}}
-									>
-										<ListItem disableGutters>
-											<InputTextField
-												label={locator}
-												required
-												placeholder="Not yet decided"
-												regexToMaintain={test_var_name}
-												sx={{ width: "100%" }}
-												value={
-													this.state.locators[locator]
-														.text
-												}
-												afterValidation={this.identifyUnsavedChanges.bind(
-													this
-												)}
-											/>
-										</ListItem>
-									</motion.div>
-								);
-							})}
-						</>
-					</AnimatePresence>
-				</List>
+				<WList
+					className={formStyles.listContainer}
+					info="No Pending Locators found"
+					length={filtered.length}
+				>
+					{filtered.map((locator) => {
+						return (
+							<WListItem key={locator}>
+								<InputTextField
+									label={locator}
+									required
+									placeholder="Not yet decided"
+									regexToMaintain={test_var_name}
+									sx={{ width: "100%" }}
+									value={this.state.locators[locator].text}
+									afterValidation={this.identifyUnsavedChanges.bind(
+										this
+									)}
+								/>
+							</WListItem>
+						);
+					})}
+				</WList>
 			</>
 		);
 	}

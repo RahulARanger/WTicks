@@ -50,13 +50,8 @@ export interface ParsedTestStep extends LocationResult {
 	parsed?: string | boolean;
 }
 
-export interface ShareDetails {
-	type:
-		| "parsedTestCase"
-		| "parsedSuite"
-		| "patchedCommands"
-		| "parsedTestCases";
-	result: string | boolean;
-}
+// export interface ShareDetails {
+// 	result?: ParsedTestStep;
+// }
 
-export type dispatcher = (details: ShareDetails) => void;
+export type dispatcher = (details?: ParsedTestStep) => void;

@@ -102,10 +102,12 @@ export default class StandaloneScript extends Component<
 	}
 
 	renderScriptGenerated(): ReactNode {
+		if (!this.state.scriptParser) return <></>;
 		return (
 			<SimpleScriptViewer
 				language={languages.javascript}
 				languageString="javascript"
+				parser={this.state.scriptParser}
 				script={this.state.scriptGenerated}
 			/>
 		);

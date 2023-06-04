@@ -49,14 +49,19 @@ abstract class GeneralizeVariable {
 	}
 	patchCommands(...test_ids: Array<string>): Set<string> {
 		const ids = new Set(test_ids);
+		this.dispatcher && this.dispatcher(); // resetting the logs
+
 		ids.forEach((test_id) => {
 			const test_case = this.parsedTestCases[test_id];
-			if (!test_case) return;
+			if (!test_case) return; // doesn't happen but for safe side
+
 			test_case.commands = test_case.commands
 				.map((step) => {
 					let text = mapSteps(step, this.locators[step.target]);
+
 					// this is required for supporting the run command
 					if (step.command_name == "run") {
+						// we find the test_case_id by the test name
 						const test_name = step.command_name;
 						const test_case = Object.keys(
 							this.parsedTestCases
@@ -66,15 +71,20 @@ abstract class GeneralizeVariable {
 								test_name
 						);
 
-						if (!test_case) text = false; // invalid step_name
-						else ids.add(test_case);
+						if (!test_case) text = false; // if not found
+						else ids.add(test_case); // else we ask the parser to patch its commands too
 					}
+
 					return {
 						...step,
 						parsed: text,
 					};
 				})
-				.filter((command) => command.parsed);
+				.filter((command) => {
+					if (command.parsed) return command.parsed;
+					this.dispatcher && this.dispatcher(command); //sending the info that this command was not patched
+				});
+			// at last we filter the commands whose result is a falsy value as it might not be supported or valid step name
 		});
 		return ids;
 	}
@@ -190,9 +200,7 @@ abstract class GeneralizeVariable {
 	}
 }
 
-export abstract class Listener extends GeneralizeVariable {}
-
-export class ToStandaloneScript extends Listener {
+export class ToStandaloneScript extends GeneralizeVariable {
 	frameWorkType: string = "Standalone";
 
 	genScript(locators: string[], ...test_case_ids: string[]): string {

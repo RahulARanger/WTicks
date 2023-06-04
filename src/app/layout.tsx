@@ -2,7 +2,8 @@
 
 import "../styles/globals.sass";
 import { Inter } from "next/font/google";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import ThemeProvider from "@mui/material/styles/ThemeProvider";
+import createTheme from "@mui/material/styles/createTheme";
 import CssBaseline from "@mui/material/CssBaseline";
 
 const darkTheme = createTheme({

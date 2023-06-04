@@ -6,3 +6,8 @@ export const arise_from_bottom: MotionProps = {
 	animate: { opacity: 1, y: 0 },
 	transition: { ...springTransition, duration: 0.6 },
 };
+
+export const slide_to_left: MotionProps = {
+	initial: { opacity: 0, x: -10 },
+	animate: { opacity: 1, x: 0 },
+};

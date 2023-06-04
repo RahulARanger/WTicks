@@ -7,8 +7,7 @@ import { Component, ReactNode } from "react";
 import { motion } from "framer-motion";
 import headerStyles from "@/styles/converter/header.module.sass";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Chip } from "@mui/material";
+import Chip from "@mui/material/Chip";
 
 interface ConverterHeaderProps {}
 

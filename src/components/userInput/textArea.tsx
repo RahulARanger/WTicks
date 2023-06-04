@@ -6,16 +6,16 @@ import "prismjs/components/prism-javascript";
 import textAreaStyles from "@/styles/converter/textArea.module.sass";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
-// import Typography from "@mui/material/Typography";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import Fab from "@mui/material/Fab";
 import Snackbar from "@mui/material/Snackbar";
 import { motion } from "framer-motion";
+import Divider from "@mui/material/Divider";
 import Alert from "@mui/material/Alert";
 import "prismjs/components/prism-json";
 import { arise_from_bottom } from "@/motion/transactions";
-import { CounterIcon } from "../errorsListBox";
+import { CounterIcon } from "../converter/parserLogs";
+import { ToStandaloneScript } from "@/theory/parser";
 
 interface LineNumberState {
 	copied: boolean;
@@ -25,6 +25,7 @@ interface LineNumberProps {
 	script: string;
 	language: Grammar;
 	languageString: string;
+	parser: ToStandaloneScript;
 }
 
 export default class SimpleScriptViewer extends Component<
@@ -54,6 +55,24 @@ export default class SimpleScriptViewer extends Component<
 
 	async closeSnack() {
 		this.setState({ copied: false });
+	}
+
+	renderTools() {
+		return (
+			<Stack className={textAreaStyles.icons}>
+				<CounterIcon parser={this.props.parser} />
+				<Divider />
+				<IconButton onClick={this.copyScript.bind(this)} color="info">
+					<ContentCopyIcon />
+				</IconButton>
+				<IconButton
+					onClick={this.downloadScript.bind(this)}
+					color="success"
+				>
+					<FileDownloadIcon />
+				</IconButton>
+			</Stack>
+		);
 	}
 
 	render(): ReactNode {
@@ -101,15 +120,7 @@ export default class SimpleScriptViewer extends Component<
 						</Snackbar>
 					</motion.div>
 				</Paper>
-				<Stack className={textAreaStyles.icons}>
-					<IconButton onClick={this.copyScript.bind(this)}>
-						<ContentCopyIcon />
-					</IconButton>
-					<IconButton onClick={this.downloadScript.bind(this)}>
-						<FileDownloadIcon />
-					</IconButton>
-					{/* <CounterIcon /> */}
-				</Stack>
+				{this.renderTools()}
 			</>
 		);
 	}
