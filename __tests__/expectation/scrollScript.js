@@ -33,12 +33,13 @@ const pageClass = new Locators();
 
 async function simple_scroll_test() {
 	await browser.url("https://www.google.com");
-	await browser.setWindowSize(1296, 736);
+	await browser.setWindowSize(1296, 1080);
 	await pageClass.searchBar.waitForEnabled({ reverse: false, timeout: 3500 });
 	await pageClass.searchBar.click();
 	await pageClass.searchBar.setValue("Rem Chan");
+	await expect(pageClass.searchBar).toHaveValue("Rem Chan");
 	await browser.keys([Key.Enter]);
-	await browser.execute("window.scrollTo(0,document.body.scrollHeight)");
+	await browser.execute("window.scrollTo(0,900)");
 	await pageClass._2rdPage.waitForDisplayed({ reverse: false, timeout: 3000 });
 	await pageClass._2rdPage.click();
 	await browser.execute("window.scrollTo(0,document.body.scrollHeight)");

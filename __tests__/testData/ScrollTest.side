@@ -20,7 +20,7 @@
           "id": "a00125cc-56fe-45c9-8d02-02b4b573cf91",
           "comment": "",
           "command": "setWindowSize",
-          "target": "1296x736",
+          "target": "1296x1080",
           "targets": [],
           "value": ""
         },
@@ -97,6 +97,12 @@
           "value": "Rem Chan"
         },
         {
+          "command": "verifyValue",
+          "target": "id=APjFqb",
+          "value": "Rem Chan",
+          "id": "0bc125da-c3aa-4206-8035-28a59c06ebdd"
+        },
+        {
           "id": "3fce7c8d-e790-4fcd-b14c-2de23e9e8594",
           "comment": "",
           "command": "sendKeys",
@@ -108,7 +114,7 @@
           "id": "02808ba3-bc90-4872-9f20-2f55a97f7927",
           "comment": "",
           "command": "runScript",
-          "target": "window.scrollTo(0,document.body.scrollHeight)",
+          "target": "window.scrollTo(0,900)",
           "targets": [],
           "value": ""
         },
