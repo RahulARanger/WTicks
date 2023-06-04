@@ -7,7 +7,7 @@ const browser = await remote({
 	capabilities: {
 		browserName: 'chrome',
 		'goog:chromeOptions': {
-			args: !process.env.CI ? ['headless', 'disable-gpu'] : []
+			args: process.env.CI ? ['headless', 'disable-gpu'] : []
 		}
 	}
 });
