@@ -37,7 +37,7 @@ async function simple_scroll_test() {
 	await pageClass.searchBar.click();
 	await pageClass.searchBar.setValue("Rem Chan");
 	await browser.keys([Key.Enter]);
-	await browser.execute("window.scrollTo(0,900)");
+	await browser.execute("window.scrollTo(0,1801.3333740234375)");
 	await pageClass._2rdPage.waitForDisplayed({ reverse: false, timeout: 3000 });
 	await pageClass._2rdPage.click();
 	await browser.execute("window.scrollTo(0,1801.3333740234375)");

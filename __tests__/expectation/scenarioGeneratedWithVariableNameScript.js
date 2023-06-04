@@ -48,6 +48,7 @@ const pageClass = new Locators();
 
 async function validating_the_search_bar_with_invalid_url() {
 	await browser.url("https://yticks.vercel.app/video");
+	await pageClass.youtube_search_bar.waitForEnabled({ reverse: false, timeout: 1000 });
 	await pageClass.youtube_search_bar.setValue("https://www.youtube.com/watch?v=sAuEeM_6zpk");
 	await expect(pageClass.youtube_search_bar).toHaveValue("https://www.youtube.com/watch?v=sAuEeM_6zpk");
 	await expect(pageClass.search_bar_location).toHaveText("You can now search");

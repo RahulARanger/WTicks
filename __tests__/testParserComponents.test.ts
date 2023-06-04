@@ -347,7 +347,7 @@ describe("Validating the step mappings", function () {
 				command_name: "waitForElementEditable",
 				value: "1500",
 			},
-			output: `await pageClass.locator_name.waitForEnabled({reverse: false, timeout: 1500});`,
+			output: `await pageClass.locator_name.waitForEnabled({ reverse: false, timeout: 1500 });`,
 		},
 		{
 			input: {
@@ -356,7 +356,7 @@ describe("Validating the step mappings", function () {
 				command_name: "waitForElementPresent",
 				value: "1500",
 			},
-			output: `await pageClass.locator_name.waitForExist({reverse: false, timeout: 1500});`,
+			output: `await pageClass.locator_name.waitForExist({ reverse: false, timeout: 1500 });`,
 		},
 		{
 			input: {
@@ -365,7 +365,7 @@ describe("Validating the step mappings", function () {
 				command_name: "waitForElementVisible",
 				value: "3e3",
 			},
-			output: `await pageClass.locator_name.waitForDisplayed({reverse: false, timeout: 3e3});`,
+			output: `await pageClass.locator_name.waitForDisplayed({ reverse: false, timeout: 3e3 });`,
 		},
 		{
 			input: {
@@ -374,7 +374,7 @@ describe("Validating the step mappings", function () {
 				command_name: "waitForElementNotEditable",
 				value: "1500",
 			},
-			output: `await pageClass.locator_name.waitForEnabled({reverse: true, timeout: 1500});`,
+			output: `await pageClass.locator_name.waitForEnabled({ reverse: true, timeout: 1500 });`,
 		},
 	];
 
