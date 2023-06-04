@@ -50,31 +50,31 @@ async function validating_the_search_bar_with_invalid_url() {
 	await browser.url("https://yticks.vercel.app/video");
 	await pageClass.youtube_search_bar.setValue("https://www.youtube.com/watch?v=sAuEeM_6zpk");
 	await expect(pageClass.youtube_search_bar).toHaveValue("https://www.youtube.com/watch?v=sAuEeM_6zpk");
-	await expect(pageClass.search_bar_location).toHaveText("You can now search")
+	await expect(pageClass.search_bar_location).toHaveText("You can now search");
 	await pageClass.search_button.click();
-	await expect(pageClass.title).toHaveText("YTicks")
+	await expect(pageClass.title).toHaveText("YTicks");
 	await pageClass.back_button.click();
 	await pageClass.youtube_search_bar.click();
 	await browser.pause(600);
 	await browser.keys([Key.Enter]);
-	await expect(pageClass.title).toHaveText("YTicks")
+	await expect(pageClass.title).toHaveText("YTicks");
 }
 
 async function validating_the_search_bar() {
 	await browser.url("https://yticks.vercel.app/video");
 	await browser.setWindowSize(518, 480);
-	await expect(pageClass.search_bar_location).toHaveText("Paste a valid Youtube URL")
+	await expect(pageClass.search_bar_location).toHaveText("Paste a valid Youtube URL");
 	await expect(pageClass.youtube_search_bar).toBePresent();
 	await pageClass.youtube_search_bar.click();
 	await expect(pageClass.search_bar_icon).toBePresent();
 	await pageClass.search_bar_icon.click();
 	await browser.pause(600);
 	await pageClass.search_bar_icon.click();
-	await expect(pageClass.tooltip).toHaveText("Invalid Input")
+	await expect(pageClass.tooltip).toHaveText("Invalid Input");
 	await pageClass.youtube_search_bar.click();
 	await pageClass.body.click();
 	await pageClass.youtube_search_bar.setValue("checking");
-	await expect(pageClass.search_bar_location).toHaveText("Paste a valid Youtube URL")
+	await expect(pageClass.search_bar_location).toHaveText("Paste a valid Youtube URL");
 	await pageClass.search_bar_icon.click();
 	await expect(pageClass.tooltip).toBePresent();
 	await pageClass.youtube_search_bar.click();

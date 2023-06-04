@@ -40,18 +40,18 @@ const pageClass = new Locators();
 async function validating_the_search_bar() {
 	await browser.url("https://yticks.vercel.app/video");
 	await browser.setWindowSize(518, 480);
-	await expect(pageClass.search_bar_location).toHaveText("Paste a valid Youtube URL")
+	await expect(pageClass.search_bar_location).toHaveText("Paste a valid Youtube URL");
 	await expect(pageClass.youtube_search_bar).toBePresent();
 	await pageClass.youtube_search_bar.click();
 	await expect(pageClass.search_bar_icon).toBePresent();
 	await pageClass.search_bar_icon.click();
 	await browser.pause(600);
 	await pageClass.search_bar_icon.click();
-	await expect(pageClass.tooltip).toHaveText("Invalid Input")
+	await expect(pageClass.tooltip).toHaveText("Invalid Input");
 	await pageClass.youtube_search_bar.click();
 	await pageClass.body.click();
 	await pageClass.youtube_search_bar.setValue("checking");
-	await expect(pageClass.search_bar_location).toHaveText("Paste a valid Youtube URL")
+	await expect(pageClass.search_bar_location).toHaveText("Paste a valid Youtube URL");
 	await pageClass.search_bar_icon.click();
 	await expect(pageClass.tooltip).toBePresent();
 	await pageClass.youtube_search_bar.click();

@@ -23,63 +23,14 @@ export function transitions(command_name: string) {
 	return f_command_name;
 }
 
-export function mapSteps(
-	step: ParsedTestStep,
-	locator_name: string
-): boolean | string {
-	// unsupported but expected
-	switch (step.command_name) {
-		case "if":
-		case "while": {
-			console.info(
-				"found script related commands, hence skipping the step to parse"
-			);
-			return true;
-		}
-	}
-
-	// supported
-
-	let command_name = transitions(step.command_name);
-	const isOpposite = command_name.startsWith("assertNot");
-
-	command_name = isOpposite ? command_name.replace("Not", "") : command_name;
-
-	const template = !step.isLocator
-		? "await "
-		: command_name.startsWith("assert")
-		? `await expect(pageClass.${locator_name}).${oppPrefix(isOpposite)}`
-		: `await pageClass.${locator_name}.`;
-
-	switch (command_name) {
-		case "run": {
-			return `await ${to_good_name(step.target)}();`;
-		}
-		case "check":
-		case "click": {
-			return template + "click();";
-		}
-		case "type": {
-			return template + `setValue(${insideQuotes(step.value)});`;
-		}
-
-		case "open": {
-			return template + `browser.url(${insideQuotes(step.target)});`;
-		}
-
-		case "setWindowSize": {
-			const [width, height] = step.target.split("x");
-			return template + `browser.setWindowSize(${width}, ${height});`;
-		}
-
-		case "sendKeys": {
-			return `await browser.keys(${identifyKeys(step.value)});`;
-		}
-
-		// assertions
-
+function handleAssertions(step: ParsedTestStep, locator_name: string) {
+	const isOpposite = step.command_name.includes("Not");
+	const template = `await expect(pageClass.${locator_name}).${oppPrefix(
+		isOpposite
+	)}`;
+	switch (step.command_name.replace("Not", "").replace("verify", "assert")) {
 		case "assertText": {
-			return template + `toHaveText(${insideQuotes(step.value)})`;
+			return template + `toHaveText(${insideQuotes(step.value)});`;
 		}
 		case "assertTitle": {
 			return (
@@ -110,38 +61,139 @@ export function mapSteps(
 		case "assertValue": {
 			return template + `toHaveValue(${insideQuotes(step.value)});`;
 		}
+		default: {
+			return false;
+		}
+	}
+}
 
-		// browser actions
+function handleUserActions(step: ParsedTestStep, locator_name: string) {
+	const template = `await pageClass.${locator_name}.`;
+
+	switch (step.command_name) {
+		case "click": {
+			return template + "click();";
+		}
+		case "check": {
+			return (
+				`if(!pageClass.${locator_name}.isSelected()) ` +
+				template +
+				"click();"
+			);
+		}
+		case "uncheck": {
+			return (
+				`if(pageClass.${locator_name}.isSelected()) ` +
+				template +
+				"click();"
+			);
+		}
+		case "type": {
+			return template + `setValue(${insideQuotes(step.value)});`;
+		}
+
+		case "echo": {
+			return `console.log("${step.target}");`;
+		}
+		default: {
+			return false;
+		}
+	}
+}
+
+function handleBrowserBasedActions(step: ParsedTestStep, locator_name: string) {
+	const template = "await browser.";
+
+	switch (step.command_name) {
+		case "open": {
+			return template + `url(${insideQuotes(step.target)});`;
+		}
+		case "setWindowSize": {
+			const [width, height] = step.target.split("x");
+			return template + `setWindowSize(${width}, ${height});`;
+		}
 		case "pause": {
-			return template + `browser.pause(${step.target});`;
+			return template + `pause(${step.target});`;
 		}
-
+		case "sendKeys": {
+			return template + `keys(${identifyKeys(step.value)});`;
+		}
 		case "runScript": {
-			return template + `browser.execute(${insideQuotes(step.target)});`;
+			return template + `execute(${insideQuotes(step.target)});`;
 		}
-
-		case "waitForVisible": {
-			return template + `waitForDisplayed(${insideQuotes(step.value)})`;
-		}
-
 		case "debugger": {
 			console.warn(
 				"Not Recommended to use debugger mode for script generation"
 			);
 			return template + "debug();";
 		}
-
-		case "echo": {
-			return `console.log("${step.target}");`;
-		}
-
 		default: {
-			console.error(
-				`${step.command_name} is not a valid locator, let me know if it is one, it might be missed from my side.`
-			);
 			return false;
 		}
 	}
+}
+
+function handleWaitForRequired(step: ParsedTestStep, locator_name: string) {
+	const isOpposite = step.command_name.includes("Not");
+
+	const template = `await pageClass.${locator_name}.`;
+	const values = `({ reverse: ${isOpposite}, timeout: ${step.value} });`;
+	switch (step.command_name.replace("Not", "")) {
+		case "waitForElementEditable": {
+			return template + "waitForEnabled" + values;
+		}
+		case "waitForElementPresent": {
+			return template + "waitForExist" + values;
+		}
+		case "waitForElementVisible": {
+			return template + "waitForDisplayed" + values;
+		}
+		default: {
+			return false;
+		}
+	}
+}
+
+export function handleMisc(step: ParsedTestStep, locator_name: string) {
+	const template = "await ";
+
+	switch (step.command_name) {
+		case "run": {
+			return template + `${to_good_name(step.target)}();`;
+		}
+		default: {
+			return false;
+		}
+	}
+}
+
+export function mapSteps(
+	step: ParsedTestStep,
+	locator_name: string
+): boolean | string {
+	// unsupported but expected
+	switch (step.command_name) {
+		case "if":
+		case "while": {
+			console.info(
+				"found script related commands, hence skipping the step to parse"
+			);
+			return true;
+		}
+	}
+
+	const command_name = step.command_name;
+
+	if (command_name.startsWith("assert") || command_name.startsWith("verify"))
+		return handleAssertions(step, locator_name);
+	else if (command_name.startsWith("waitFor"))
+		return handleWaitForRequired(step, locator_name);
+	else
+		return (
+			handleUserActions(step, locator_name) ||
+			handleBrowserBasedActions(step, locator_name) ||
+			handleMisc(step, locator_name)
+		);
 }
 
 export function parseLocators(locator: string): LocationResult {

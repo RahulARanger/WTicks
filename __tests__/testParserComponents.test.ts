@@ -121,34 +121,9 @@ describe("Verifying the helper functions for step mapping", function () {
 
 describe("Validating the step mappings", function () {
 	const locator_name = "locator_name";
-	const tests: Array<ExpectedStepResult> = [
-		{
-			input: {
-				isLocator: false,
-				target: "Some Script",
-				value: "",
-				command_name: "run",
-			},
-			output: "await Some_Script();",
-		},
-		{
-			input: {
-				isLocator: true,
-				target: ".button",
-				value: "",
-				command_name: "click",
-			},
-			output: `await pageClass.locator_name.click();`,
-		},
-		{
-			input: {
-				isLocator: true,
-				target: "input",
-				command_name: "type",
-				value: "dummy_text",
-			},
-			output: `await pageClass.locator_name.setValue("dummy_text");`,
-		},
+	type testsType = Array<ExpectedStepResult>;
+
+	const assertTests: testsType = [
 		{
 			input: {
 				isLocator: true,
@@ -160,30 +135,21 @@ describe("Validating the step mappings", function () {
 		},
 		{
 			input: {
-				isLocator: false,
-				target: "1296x736",
-				command_name: "setWindowSize",
-				value: "",
-			},
-			output: "await browser.setWindowSize(1296, 736);",
-		},
-		{
-			input: {
-				isLocator: false,
-				target: "https://the-internet.herokuapp.com/",
-				command_name: "open",
-				value: "",
-			},
-			output: `await browser.url("https://the-internet.herokuapp.com/");`,
-		},
-		{
-			input: {
 				isLocator: true,
 				target: "input#selected",
 				command_name: "assertEditable",
 				value: "",
 			},
 			output: "await expect(pageClass.locator_name).toBeEnabled();",
+		},
+		{
+			input: {
+				isLocator: true,
+				target: "css=.added-manually",
+				command_name: "assertElementPresent",
+				value: "true",
+			},
+			output: "await expect(pageClass.locator_name).toBePresent();",
 		},
 		{
 			input: {
@@ -214,24 +180,6 @@ describe("Validating the step mappings", function () {
 		},
 		{
 			input: {
-				isLocator: false,
-				target: "Hello There",
-				command_name: "echo",
-				value: "",
-			},
-			output: `console.log("Hello There");`,
-		},
-		{
-			input: {
-				isLocator: false,
-				command_name: "runScript",
-				target: "window.scrollTo(0,900)",
-				value: "",
-			},
-			output: `await browser.execute("window.scrollTo(0,900)");`,
-		},
-		{
-			input: {
 				isLocator: true,
 				command_name: "verifyElementPresent",
 				target: "input#search",
@@ -247,6 +195,63 @@ describe("Validating the step mappings", function () {
 				value: "",
 			},
 			output: "await expect(pageClass.locator_name).not.toBePresent();",
+		},
+		{
+			input: {
+				isLocator: true,
+				command_name: "verifyNotChecked",
+				target: "input#checkbox",
+				value: "",
+			},
+			output: "await expect(pageClass.locator_name).not.toBeChecked();",
+		},
+		{
+			input: {
+				isLocator: true,
+				command_name: "verifyNotText",
+				target: "div#error",
+				value: "Failed",
+			},
+			output: 'await expect(pageClass.locator_name).not.toHaveText("Failed");',
+		},
+	];
+
+	const browserActionTests: testsType = [
+		{
+			input: {
+				isLocator: false,
+				target: "1296x736",
+				command_name: "setWindowSize",
+				value: "",
+			},
+			output: "await browser.setWindowSize(1296, 736);",
+		},
+		{
+			input: {
+				isLocator: false,
+				target: "1296x736",
+				command_name: "setWindowSize",
+				value: "",
+			},
+			output: "await browser.setWindowSize(1296, 736);",
+		},
+		{
+			input: {
+				isLocator: false,
+				target: "https://the-internet.herokuapp.com/",
+				command_name: "open",
+				value: "",
+			},
+			output: `await browser.url("https://the-internet.herokuapp.com/");`,
+		},
+		{
+			input: {
+				isLocator: false,
+				command_name: "runScript",
+				target: "window.scrollTo(0,900)",
+				value: "",
+			},
+			output: `await browser.execute("window.scrollTo(0,900)");`,
 		},
 		{
 			input: {
@@ -275,13 +280,145 @@ describe("Validating the step mappings", function () {
 			},
 			output: 'await browser.keys(["s","e","a","r","c","h","e","d",Key.Enter]);',
 		},
+		{
+			input: {
+				isLocator: false,
+				command_name: "pause",
+				target: "3000",
+				value: "",
+			},
+			output: "await browser.pause(3000);",
+		},
 	];
 
-	test.each<ExpectedStepResult>(tests)(
-		"Verifying the result if the step is of $input",
-		function ({ input, output }) {
-			expect(mapSteps(input, locator_name)).toEqual(output);
-		}
+	const userActionTests: testsType = [
+		{
+			input: {
+				isLocator: true,
+				target: ".button",
+				value: "",
+				command_name: "click",
+			},
+			output: `await pageClass.locator_name.click();`,
+		},
+		{
+			input: {
+				isLocator: true,
+				target: ".checkbox",
+				value: "",
+				command_name: "check",
+			},
+			output: `if(!pageClass.locator_name.isSelected()) await pageClass.locator_name.click();`,
+		},
+		{
+			input: {
+				isLocator: true,
+				target: ".checkbox",
+				value: "",
+				command_name: "uncheck",
+			},
+			output: `if(pageClass.locator_name.isSelected()) await pageClass.locator_name.click();`,
+		},
+		{
+			input: {
+				isLocator: true,
+				target: "input",
+				command_name: "type",
+				value: "dummy_text",
+			},
+			output: `await pageClass.locator_name.setValue("dummy_text");`,
+		},
+		{
+			input: {
+				isLocator: false,
+				target: "Hello There",
+				command_name: "echo",
+				value: "",
+			},
+			output: `console.log("Hello There");`,
+		},
+	];
+
+	const waitForTests: testsType = [
+		{
+			input: {
+				isLocator: true,
+				target: "input",
+				command_name: "waitForElementEditable",
+				value: "1500",
+			},
+			output: `await pageClass.locator_name.waitForEnabled({reverse: false, timeout: 1500});`,
+		},
+		{
+			input: {
+				isLocator: true,
+				target: "input",
+				command_name: "waitForElementPresent",
+				value: "1500",
+			},
+			output: `await pageClass.locator_name.waitForExist({reverse: false, timeout: 1500});`,
+		},
+		{
+			input: {
+				isLocator: true,
+				target: "input",
+				command_name: "waitForElementVisible",
+				value: "3e3",
+			},
+			output: `await pageClass.locator_name.waitForDisplayed({reverse: false, timeout: 3e3});`,
+		},
+		{
+			input: {
+				isLocator: true,
+				target: "input",
+				command_name: "waitForElementNotEditable",
+				value: "1500",
+			},
+			output: `await pageClass.locator_name.waitForEnabled({reverse: true, timeout: 1500});`,
+		},
+	];
+
+	const miscTests: testsType = [
+		{
+			input: {
+				isLocator: false,
+				target: "Some Script",
+				value: "",
+				command_name: "run",
+			},
+			output: "await Some_Script();",
+		},
+	];
+
+	function mapTests({
+		input,
+		output,
+	}: {
+		input: ParsedTestStep;
+		output: boolean | string;
+	}) {
+		expect(mapSteps(input, locator_name)).toEqual(output);
+	}
+
+	test.each<ExpectedStepResult>(assertTests)(
+		"Verifying the Mappings for the Assertions: $input",
+		mapTests
+	);
+	test.each<ExpectedStepResult>(browserActionTests)(
+		"Verifying the Mappings for the browser actions: $input",
+		mapTests
+	);
+	test.each<ExpectedStepResult>(userActionTests)(
+		"Verifying the Mappings for the user actions: $input",
+		mapTests
+	);
+	test.each<ExpectedStepResult>(waitForTests)(
+		"Verifying the Mappings for the wait for elements: $input",
+		mapTests
+	);
+	test.each<ExpectedStepResult>(miscTests)(
+		"Verifying the Mappings for the misc steps: $input",
+		mapTests
 	);
 });
 
