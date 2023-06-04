@@ -49,7 +49,7 @@ export class PatchForm extends Component<FormProps, FormState> {
 		showPendingAlone: false,
 		locators: {},
 		goodToGenerate: false,
-		error: "",
+		error: "Please verify before generating the script",
 	};
 	// HELPER METHODS
 	parser() {
@@ -86,16 +86,8 @@ export class PatchForm extends Component<FormProps, FormState> {
 		console.log(this.state.locators);
 	}
 
-	genTooltipMessage(): string {
-		return this.state.goodToGenerate && this.state.selectedOption
-			? "Generate Script"
-			: (!this.state.selectedOption
-					? "Please select the test component"
-					: "Please verify before generating") || this.state.error;
-	}
-
 	// validation or state changer methods
-	identifyUnsavedChanges(text: string, locator: string, isError: boolean) {
+	afterEveryInputTypes(text: string, locator: string, isError: boolean) {
 		const locators = this.state.locators;
 		locators[locator] = { text, isError };
 
@@ -104,10 +96,8 @@ export class PatchForm extends Component<FormProps, FormState> {
 		const same = this.props.parser.locators[locator] === text;
 		const so = isError ? false : same;
 		const errorMsg = isError
-			? "Error found in one of the input"
-			: same
-			? undefined
-			: "Please verify before generating the script";
+			? "Please verify before generating the script"
+			: "";
 
 		this.setState({
 			goodToGenerate: so,
@@ -149,8 +139,8 @@ export class PatchForm extends Component<FormProps, FormState> {
 			error: isThereDuplicate
 				? "Please ensure we do not use duplicate names"
 				: isThereError
-				? "Please rectify the error before verifying it"
-				: this.genTooltipMessage(),
+				? "Please rectify the errors before verifying it"
+				: "",
 			showPendingAlone:
 				isThereDuplicate || isThereError
 					? true
@@ -250,7 +240,7 @@ export class PatchForm extends Component<FormProps, FormState> {
 									regexToMaintain={test_var_name}
 									sx={{ width: "100%" }}
 									value={this.state.locators[locator].text}
-									afterValidation={this.identifyUnsavedChanges.bind(
+									afterValidation={this.afterEveryInputTypes.bind(
 										this
 									)}
 								/>
@@ -299,7 +289,6 @@ export class PatchForm extends Component<FormProps, FormState> {
 		const locators = this.props.parser.locators;
 		const savedLength = Object.keys(locators).length;
 		const hasLocators = savedLength > 0;
-		const message = this.genTooltipMessage();
 
 		return (
 			<>
@@ -319,11 +308,11 @@ export class PatchForm extends Component<FormProps, FormState> {
 					<Tooltip
 						title={
 							<Typography color="lightyellow" variant="caption">
-								{message}
+								{this.state.error}
 							</Typography>
 						}
 						arrow
-						open={!!message}
+						open={!!this.state.error}
 					>
 						<span>
 							<Button
@@ -332,13 +321,17 @@ export class PatchForm extends Component<FormProps, FormState> {
 									!this.state.selectedOption ||
 									!this.state.goodToGenerate
 								}
-								onClick={() =>
+								onClick={() => {
 									this.state.selectedOption &&
-									this.props.toGenerate(
-										this.state.selectedOption,
-										this.state.locators
-									)
-								}
+										this.props.toGenerate(
+											this.state.selectedOption,
+											this.state.locators
+										);
+									this.setState({
+										error: "Already Generated",
+										goodToGenerate: false,
+									});
+								}}
 							>
 								Generate
 							</Button>
