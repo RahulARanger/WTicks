@@ -111,6 +111,12 @@
           "value": "${KEY_ENTER}"
         },
         {
+          "command": "pause",
+          "target": "1000",
+          "value": "",
+          "id": "cb48ff9f-ffd5-439d-8562-1fc7fa9922c0"
+        },
+        {
           "id": "02808ba3-bc90-4872-9f20-2f55a97f7927",
           "comment": "",
           "command": "runScript",

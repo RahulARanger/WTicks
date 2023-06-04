@@ -7,7 +7,7 @@ const browser = await remote({
 	capabilities: {
 		browserName: 'chrome',
 		'goog:chromeOptions': {
-			args: process.env.CI ? ['headless', 'disable-gpu'] : []
+			args: !process.env.CI ? ['headless', 'disable-gpu'] : []
 		}
 	}
 });
@@ -33,12 +33,15 @@ const pageClass = new Locators();
 
 async function simple_scroll_test() {
 	await browser.url("https://www.google.com");
-	await browser.setWindowSize(1296, 1080);
+	console.warn(await browser.getWindowRect());
+	await browser.setWindowSize(1280, 800);
+	console.warn(await browser.getWindowRect(), "after");
 	await pageClass.searchBar.waitForEnabled({ reverse: false, timeout: 3500 });
 	await pageClass.searchBar.click();
 	await pageClass.searchBar.setValue("Rem Chan");
 	await expect(pageClass.searchBar).toHaveValue("Rem Chan");
 	await browser.keys([Key.Enter]);
+	await browser.pause(1000);
 	await browser.execute("window.scrollTo(0,900)");
 	await pageClass._2rdPage.waitForDisplayed({ reverse: false, timeout: 3000 });
 	await pageClass._2rdPage.click();
