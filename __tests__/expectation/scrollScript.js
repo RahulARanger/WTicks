@@ -33,9 +33,9 @@ const pageClass = new Locators();
 
 async function simple_scroll_test() {
 	await browser.url("https://www.google.com");
-	console.warn(await browser.getWindowRect());
+	console.warn(await browser.getWindowSize());
 	await browser.setWindowSize(1280, 800);
-	console.warn(await browser.getWindowRect(), "after");
+	console.warn(await browser.getWindowSize(), "after");
 	await pageClass.searchBar.waitForEnabled({ reverse: false, timeout: 3500 });
 	await pageClass.searchBar.click();
 	await pageClass.searchBar.setValue("Rem Chan");
