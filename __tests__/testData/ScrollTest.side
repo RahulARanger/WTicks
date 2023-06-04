@@ -25,6 +25,12 @@
           "value": ""
         },
         {
+          "command": "waitForElementEditable",
+          "target": "id=APjFqb",
+          "value": "3500",
+          "id": "eaa20077-8c85-46f1-8508-4684c3c3de2b"
+        },
+        {
           "id": "870e6191-da7e-4456-8f49-1660e3598181",
           "comment": "",
           "command": "click",
@@ -102,7 +108,7 @@
           "id": "02808ba3-bc90-4872-9f20-2f55a97f7927",
           "comment": "",
           "command": "runScript",
-          "target": "window.scrollTo(0,1801.3333740234375)",
+          "target": "window.scrollTo(0,document.body.scrollHeight)",
           "targets": [],
           "value": ""
         },
@@ -150,7 +156,7 @@
           "id": "1e974182-c731-4d87-98af-e8151ace6fd1",
           "comment": "",
           "command": "runScript",
-          "target": "window.scrollTo(0,1801.3333740234375)",
+          "target": "window.scrollTo(0,document.body.scrollHeight)",
           "targets": [],
           "value": ""
         },
