@@ -47,6 +47,7 @@ export interface ParsedTestStep extends LocationResult {
 	target: string;
 	value: string;
 	command_name: string;
+	logged?: string;
 	parsed?: string | boolean;
 }
 

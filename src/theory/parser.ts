@@ -78,6 +78,7 @@ abstract class GeneralizeVariable {
 					return {
 						...step,
 						parsed: text,
+						logged: new Date().toLocaleTimeString(),
 					};
 				})
 				.filter((command) => {

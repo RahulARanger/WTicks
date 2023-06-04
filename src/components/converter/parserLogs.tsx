@@ -9,6 +9,9 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import WDialog from "../dialog";
 import WListitem, { WList } from "../list";
+import WListItem from "../list";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 
 interface CounterProps {
 	parser: ToStandaloneScript;
@@ -49,10 +52,29 @@ export function CounterIcon(props: CounterProps) {
 			</Badge>
 			<WDialog open={open} onClose={toClose} titleChildren={"Alerts"}>
 				<DialogContent>
-					<WList
-						length={logs.length}
-						info="No Alerts received yet"
-					></WList>
+					<WList length={logs.length} info="No Alerts received yet">
+						<>
+							{logs.map((_, index, ref_logs) => {
+								const log =
+									ref_logs[ref_logs.length - index - 1];
+								return (
+									<WListItem
+										key={log.command_name + "-" + index}
+									>
+										<Alert
+											title={"Failed to log"}
+											severity="error"
+										>
+											<AlertTitle>
+												{`${log.command_name} not recognized: ${log.logged}`}
+											</AlertTitle>
+											{`Following command: ${log.command_name} set on the locator ${log.target} is skipped`}
+										</Alert>
+									</WListItem>
+								);
+							})}
+						</>
+					</WList>
 				</DialogContent>
 			</WDialog>
 		</>
