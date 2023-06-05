@@ -1,6 +1,6 @@
 {
 	"id": "2bfacec4-ea7a-48c4-bdfe-22d693069b8d",
-	"version": "2.0",
+	"version": "3.0",
 	"name": "Adding and Removing an Element in the web app",
 	"url": "https://the-internet.herokuapp.com/",
 	"tests": [

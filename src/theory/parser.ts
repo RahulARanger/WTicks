@@ -197,7 +197,10 @@ abstract class GeneralizeVariable {
 	}
 
 	isValidFile(): boolean {
-		return Boolean(this.parsed?.name) && this.parsed?.version === "2.0";
+		return (
+			Boolean(this.parsed?.name) &&
+			(this.parsed?.version === "2.0" || this.parsed?.version === "3.0")
+		);
 	}
 }
 
