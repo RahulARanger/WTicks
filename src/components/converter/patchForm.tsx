@@ -82,8 +82,6 @@ export class PatchForm extends Component<FormProps, FormState> {
 			locators: locators_to_be_state,
 			selectedOption,
 		});
-
-		console.log(this.state.locators);
 	}
 
 	// validation or state changer methods

@@ -195,11 +195,10 @@ abstract class GeneralizeVariable {
 		return suite;
 	}
 
-	parseSuite(suite_id: string): string[] | void {
+	parseSuite(suite_id: string): Set<string> | void {
 		const suite = this.fetchSuite(suite_id);
 		if (!suite) return;
-		this.patchCommands(...suite.tests);
-		return suite.tests;
+		return this.patchCommands(...suite.tests);
 	}
 
 	parseAllTestCases() {

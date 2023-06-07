@@ -48,15 +48,24 @@ export default class StandaloneScript extends Component<
 				parser.patchName(locator, locators[locator].text);
 		});
 
+		let flow_test_options;
 		let test_cases;
-		if (selectedOption.is_suite)
+		if (selectedOption.is_suite) {
 			test_cases = parser.parseSuite(selectedOption.value);
-		else test_cases = parser.patchCommands(selectedOption.value);
+			if (test_cases)
+				flow_test_options = parser.fetchSuite(
+					selectedOption.value
+				)?.tests;
+		} else {
+			test_cases = parser.patchCommands(selectedOption.value);
+			flow_test_options = [selectedOption.value];
+		}
 
 		this.setState({
 			scriptGenerated: parser.genScript(
 				Object.keys(locators),
-				...Array.from(test_cases || [])
+				Array.from(test_cases || []),
+				...(flow_test_options || [])
 			),
 		});
 	}
