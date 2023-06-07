@@ -37,7 +37,12 @@ const browser = await remote({
 });`;
 
 export function to_good_name(name: string): string {
+	if (!name) return "_";
 	let trimmed_name = name.trim().replace(/[^a-zA-Z0-9]/g, "_");
+
+	trimmed_name =
+		trimmed_name.at(0)?.toLowerCase() +
+		trimmed_name.slice(1, trimmed_name.length);
 
 	// If the string starts with a digit or is an empty string, add a prefix
 	if (/^[0-9]/.test(trimmed_name) || trimmed_name === "")

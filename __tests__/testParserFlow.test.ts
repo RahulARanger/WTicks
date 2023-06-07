@@ -132,7 +132,7 @@ describe("Validating the parsed results based on the type of the file uploaded",
 			expect(Object.keys(parser.parsedTestCases)).toHaveLength(1);
 			// we only the test case that we parsed so we based on the previous test case we would need to call the parseAllTestCases to ensure that all are passed
 			// but we would need to support this scenario as well
-			expect(parser.parsedTestCases[test_case].step_name).toBe(
+			expect(parser.parsedTestCases[test_case].test_name).toBe(
 				"Validating the search bar"
 			);
 		});
@@ -192,10 +192,9 @@ describe("Validating the parsed results based on the type of the file uploaded",
 		});
 
 		test("Generating the script required for the test case", function () {
-			const script = parser.genScript(
-				Object.keys(patched_names),
-				test_case
-			);
+			const script = parser.genScript(Object.keys(patched_names), [
+				test_case,
+			]);
 			expect(script).toBe(
 				readExpectation("testWithVariableNameScript.js")
 			);
@@ -248,7 +247,7 @@ describe("Validating the parsed results based on the type of the file uploaded",
 
 			const script_generated = parser.genScript(
 				Object.keys(patched_names),
-				...inside_tests
+				inside_tests
 			);
 			expect(script_generated).toBe(
 				readExpectation("scenarioGeneratedWithVariableNameScript.js")
@@ -265,7 +264,7 @@ describe("Validating the parsed results based on the type of the file uploaded",
 			patched_names["dummy"] = "dummy";
 			const script_generated = parser.genScript(
 				Object.keys(patched_names),
-				...inside_tests
+				inside_tests
 			);
 
 			expect(script_generated).not.toBe(
@@ -281,30 +280,62 @@ describe("Validating the parsed results based on the type of the file uploaded",
 				Object.keys(patched_names)
 			);
 			parser.parseAllTestCases();
+			patched_names[".MuiTypography-alignCenter"] = "showMore";
+			// this is the only one locator it has apart from the scenario so adding to the expected result
 			expect(Object.keys(parser.locators)).toEqual(
 				Object.keys(patched_names)
 			);
 		});
 	});
 
-	test("Script Generation with one key command", function () {
+	describe("Executing Multiple Test cases due to the run command", function () {
 		const parser = new ToStandaloneScript();
-		parser.feed(readMockData("ScrollTest.side"));
-		const test_case = "8f09a985-8915-4f80-9854-faf7400b028b";
-		parser.parseTestCases(test_case);
-
-		const patched: { [key: string]: string } = {
-			"#APjFqb": "searchBar",
-			"=2": "_2rdPage",
-			"=4": "_4thPage",
+		parser.feed(readMockData("WithVariableNames.side"));
+		const test_case = "1b958017-b1ba-4de5-b21b-7b5018a0c187";
+		const helper_test_case = "b8fba4eb-8596-44ba-a748-d8384b8aa598";
+		const patch_for_main_test_case: { [key: string]: string } = {
+			".MuiTypography-alignCenter": "ShowMore",
 		};
 
-		Object.keys(patched).forEach((key) => {
-			parser.patchName(key, patched[key]);
+		const patch_for_helper_test_case: { [key: string]: string } = {
+			"#\\\\:Ril56\\\\:-label": "search_bar_location",
+			"#\\\\:Ril56\\\\:": "youtube_search_bar",
+			".MuiIconButton-sizeSmall": "search_button",
+			".MuiTypography-h6": "title",
+			".css-xkbv5f": "back_button",
+		};
+		const patched = {
+			...patch_for_main_test_case,
+			...patch_for_helper_test_case,
+		};
+		parser.parseAllTestCases();
+
+		test("Verifying if parsing a test case with run will also parse the other test case", function () {
+			const locators = parser.parseTestCases(test_case);
+			// parses helper_test_case too as it we would need to provide its locators as well
+			expect(locators).toEqual(new Set(Object.keys(patched)));
 		});
-		expect(parser.patchCommands(test_case).has(test_case)).toBe(true);
-		expect(parser.genScript(Object.keys(patched), test_case)).toBe(
-			readExpectation("scrollScript.js")
-		);
+
+		test("patching the subset of the names", function () {
+			Object.keys(patched).forEach((key) => {
+				expect(parser.patchName(key, patched[key])).toBe(true);
+			});
+		});
+
+		test("Patching the commands", function () {
+			const test_ids = parser.patchCommands(test_case);
+			expect(test_ids).toEqual(new Set([helper_test_case, test_case]));
+		});
+
+		test("Generating the script", function () {
+			expect(
+				parser.genScript(
+					Object.keys(patched),
+					[test_case],
+					test_case,
+					helper_test_case
+				)
+			).toBe(readExpectation("scrollScript.js"));
+		});
 	});
 });

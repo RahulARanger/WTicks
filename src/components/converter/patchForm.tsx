@@ -160,7 +160,7 @@ export class PatchForm extends Component<FormProps, FormState> {
 			})),
 			...test_cases.map((testCase) => ({
 				value: testCase.id,
-				label: testCase.step_name,
+				label: testCase.test_name,
 				is_suite: false,
 			})),
 		];

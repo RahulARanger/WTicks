@@ -46,8 +46,9 @@ class Locators {
 
 const pageClass = new Locators();
 
-async function validating_the_search_bar_with_invalid_url() {
+async function searching_for_a_Video() {
 	await browser.url("https://yticks.vercel.app/video");
+	await browser.setWindowSize(1280, 800);
 	await pageClass.youtube_search_bar.waitForEnabled({ reverse: false, timeout: 1000 });
 	await pageClass.youtube_search_bar.setValue("https://www.youtube.com/watch?v=sAuEeM_6zpk");
 	await expect(pageClass.youtube_search_bar).toHaveValue("https://www.youtube.com/watch?v=sAuEeM_6zpk");
@@ -82,7 +83,7 @@ async function validating_the_search_bar() {
 }
 
 ; (async () => {
-	await validating_the_search_bar_with_invalid_url();
+	await searching_for_a_Video();
 	await validating_the_search_bar();
 	await browser.deleteSession();
 })();

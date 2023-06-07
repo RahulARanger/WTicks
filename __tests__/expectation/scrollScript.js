@@ -17,40 +17,57 @@ class Locators {
 	$(location) {
 		return browser.$(location);
 	}
-	get searchBar() {
-		return this.$("#APjFqb");
+	get ShowMore() {
+		return this.$(".MuiTypography-alignCenter");
 	}
-	get _2rdPage() {
-		return this.$("=2");
+	get search_bar_location() {
+		return this.$("#\\:Ril56\\:-label");
 	}
-	get _4thPage() {
-		return this.$("=4");
+	get youtube_search_bar() {
+		return this.$("#\\:Ril56\\:");
+	}
+	get search_button() {
+		return this.$(".MuiIconButton-sizeSmall");
+	}
+	get title() {
+		return this.$(".MuiTypography-h6");
+	}
+	get back_button() {
+		return this.$(".css-xkbv5f");
 	}
 };
 
 
 const pageClass = new Locators();
 
-async function simple_scroll_test() {
-	await browser.url("https://www.google.com");
-	console.warn(await browser.getWindowRect(), "before");
-	await browser.setWindowRect(0, 0, 1280, 800);
+async function loading_More_comments() {
+	await searching_for_a_Video();
+	await browser.pause(500);
+	await browser.execute("document.querySelector(\".MuiTypography-alignCenter\").scrollIntoView()");
+	await expect(pageClass.ShowMore).toHaveText("Show More");
+	await pageClass.ShowMore.click();
+	await browser.pause(500);
+	await browser.execute("document.querySelector(\".MuiTypography-alignCenter\").scrollIntoView()");
+	await pageClass.ShowMore.click();
+}
+
+async function searching_for_a_Video() {
+	await browser.url("https://yticks.vercel.app/video");
 	await browser.setWindowSize(1280, 800);
-	console.warn(await browser.getWindowRect(), "after");
-	await pageClass.searchBar.waitForEnabled({ reverse: false, timeout: 3500 });
-	await pageClass.searchBar.click();
-	await pageClass.searchBar.setValue("Rem Chan");
-	await expect(pageClass.searchBar).toHaveValue("Rem Chan");
+	await pageClass.youtube_search_bar.waitForEnabled({ reverse: false, timeout: 1000 });
+	await pageClass.youtube_search_bar.setValue("https://www.youtube.com/watch?v=sAuEeM_6zpk");
+	await expect(pageClass.youtube_search_bar).toHaveValue("https://www.youtube.com/watch?v=sAuEeM_6zpk");
+	await expect(pageClass.search_bar_location).toHaveText("You can now search");
+	await pageClass.search_button.click();
+	await expect(pageClass.title).toHaveText("YTicks");
+	await pageClass.back_button.click();
+	await pageClass.youtube_search_bar.click();
+	await browser.pause(600);
 	await browser.keys([Key.Enter]);
-	await browser.pause(1000);
-	await browser.execute("window.scrollTo(0,900)");
-	await pageClass._2rdPage.waitForDisplayed({ reverse: false, timeout: 3000 });
-	await pageClass._2rdPage.click();
-	await browser.execute("window.scrollTo(0,document.body.scrollHeight)");
-	await pageClass._4thPage.click();
+	await expect(pageClass.title).toHaveText("YTicks");
 }
 
 ; (async () => {
-	await simple_scroll_test();
+	await loading_More_comments();
 	await browser.deleteSession();
 })();

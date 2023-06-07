@@ -11,7 +11,9 @@ function browserAssertion(isOpposite: boolean) {
 
 export function insideQuotes(value: any): any {
 	// if string then inside the quotes else it is not
-	return typeof value === "string" ? `\"${value}\"` : value;
+	return typeof value === "string"
+		? `\"${value.replaceAll('"', '\\"')}\"`
+		: value;
 }
 
 export function transitions(command_name: string) {

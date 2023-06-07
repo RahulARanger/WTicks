@@ -109,10 +109,12 @@ describe("Verifying the helper functions for step mapping", function () {
 		["0thTest", "_0thTest"],
 		["0.69", "_0_69"],
 		["2ndPage", "_2ndPage"],
+		["verifying the name", "verifying_the_name"],
+		["Caps", "caps"],
 	];
 
 	test.each(verifyNames)(
-		"Verifying the conversion of input to suitable name for js's variables / functions; $input",
+		"Verifying the conversion of input to suitable name for js's variables / functions; %p",
 		function (input, output) {
 			expect(to_good_name(input)).toBe(output);
 		}
@@ -386,7 +388,7 @@ describe("Validating the step mappings", function () {
 				value: "",
 				command_name: "run",
 			},
-			output: "await Some_Script();",
+			output: "await some_Script();",
 		},
 	];
 
@@ -436,7 +438,7 @@ describe("Verifying the inside quotes scripts", function () {
 			"Then we have template quotes: `${some_var}`",
 			'"Then we have template quotes: `${some_var}`"',
 		],
-		['It has some "quotes"', '"It has some "quotes""'],
+		['It has some "quotes"', '"It has some \\"quotes\\""'],
 	];
 
 	test.each<testsType>(tests)(

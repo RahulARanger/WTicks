@@ -32,7 +32,7 @@ export interface SideScript {
 }
 
 export interface ParsedTestCase {
-	step_name: string;
+	test_name: string;
 	commands: Array<ParsedTestStep>;
 	id: string;
 }

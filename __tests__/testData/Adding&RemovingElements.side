@@ -71,7 +71,7 @@
 					"id": "59f0080a-df34-40d0-8bb8-63309031e38e",
 					"comment": "",
 					"command": "run",
-					"target": "Given I open test case for adding / removing elements",
+					"target": "Given I open a test case for adding/removing elements",
 					"targets": [],
 					"value": ""
 				},

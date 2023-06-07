@@ -1,681 +1,824 @@
 {
-	"id": "12cf557d-37fe-41d1-b514-4fd20dcf1f65",
-	"version": "3.0",
-	"name": "WithVariableNames",
-	"url": "https://yticks.vercel.app/video",
-	"tests": [
-		{
-			"id": "a75ae196-3bab-4d1c-b7db-ccd3b331ba6b",
-			"name": "Validating the search bar",
-			"commands": [
-				{
-					"id": "62bb4987-14e9-4b8d-a0d3-7dcf9936722a",
-					"command": "open",
-					"target": "https://yticks.vercel.app/video",
-					"value": ""
-				},
-				{
-					"comment": "",
-					"command": "setWindowSize",
-					"target": "518x480",
-					"targets": [],
-					"value": "",
-					"id": "162d5c92-c7e2-42ba-830a-bf0ed3455dbf"
-				},
-				{
-					"command": "verifyText",
-					"target": "id=:Ril56:-label",
-					"value": "Paste a valid Youtube URL",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "a44611f1-6fb6-424d-a198-c6a1d6c9435b",
-					"targets": [
-						[
-							"id=:Ril56:-label",
-							"id"
-						],
-						[
-							"css=[data-shrink]",
-							"css:data-attr"
-						],
-						[
-							"css=#\\3ARil56\\3A-label",
-							"css:finder"
-						],
-						[
-							"xpath=(//label[@id=':Ril56:-label'])[1]",
-							"xpath:attributes"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/label)[1]",
-							"xpath:idRelative"
-						],
-						[
-							"xpath=//label[contains(.,'Paste a valid Youtube URL')]",
-							"xpath:innerText"
-						]
-					]
-				},
-				{
-					"command": "verifyElementPresent",
-					"target": "id=:Ril56:",
-					"value": "",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "cc78547d-b9be-4812-ab27-7d9e99e01afc",
-					"targets": [
-						[
-							"id=:Ril56:",
-							"id"
-						],
-						[
-							"name=yt-url",
-							"name"
-						],
-						[
-							"css=#\\3ARil56\\3A",
-							"css:finder"
-						],
-						[
-							"xpath=(//input[@id=':Ril56:'])[1]",
-							"xpath:attributes"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
-							"xpath:idRelative"
-						]
-					],
-					"comment": "search_bar"
-				},
-				{
-					"command": "click",
-					"target": "id=:Ril56:",
-					"value": "",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "c7cfb6d7-03bc-4cc7-a94e-c97f2b099d44",
-					"targets": [
-						[
-							"id=:Ril56:",
-							"id"
-						],
-						[
-							"name=yt-url",
-							"name"
-						],
-						[
-							"css=#\\3ARil56\\3A",
-							"css:finder"
-						],
-						[
-							"xpath=(//input[@id=':Ril56:'])[1]",
-							"xpath:attributes"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
-							"xpath:idRelative"
-						]
-					]
-				},
-				{
-					"command": "verifyElementPresent",
-					"target": "css=.MuiInputAdornment-root > span",
-					"value": "",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "69d3e990-30a4-4d1d-b185-0d0f80fc388b",
-					"targets": [
-						[
-							"css=.MuiInputAdornment-root > span",
-							"css:finder"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/div/div/span)[1]",
-							"xpath:idRelative"
-						]
-					]
-				},
-				{
-					"command": "click",
-					"target": "css=.MuiInputAdornment-root > span",
-					"value": "",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"targets": [
-						[
-							"css=.MuiInputAdornment-root > span",
-							"css:finder"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/div/div/span)[1]",
-							"xpath:idRelative"
-						]
-					],
-					"id": "c03844dd-46e1-45c8-a978-cabdc32c4b58"
-				},
-				{
-					"command": "pause",
-					"target": "600",
-					"value": "",
-					"id": "3f478ee0-22bb-421b-8968-b8003d84535b",
-					"comment": "we are pausing here as we have a transition on the input search bar when it loses its focus"
-				},
-				{
-					"command": "click",
-					"target": "css=.MuiInputAdornment-root > span",
-					"value": "",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "e0560c9e-feb4-42cb-95f0-18f51b56e736",
-					"targets": [
-						[
-							"css=.MuiInputAdornment-root > span",
-							"css:finder"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/div/div/span)[1]",
-							"xpath:idRelative"
-						]
-					]
-				},
-				{
-					"command": "verifyText",
-					"target": "css=.MuiTooltip-tooltip",
-					"value": "Invalid Input",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "bc9a7657-f652-440b-a6f4-6f06828c258d",
-					"targets": [
-						[
-							"css=.MuiTooltip-tooltip",
-							"css:finder"
-						],
-						[
-							"xpath=(//div[@id=':R57alil56:']/div)[1]",
-							"xpath:idRelative"
-						]
-					]
-				},
-				{
-					"command": "click",
-					"target": "id=:Ril56:",
-					"value": "",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "75bbf9fa-4fdc-4695-a31e-4d980788095b",
-					"targets": [
-						[
-							"id=:Ril56:",
-							"id"
-						],
-						[
-							"name=yt-url",
-							"name"
-						],
-						[
-							"css=#\\3ARil56\\3A",
-							"css:finder"
-						],
-						[
-							"xpath=(//input[@id=':Ril56:'])[1]",
-							"xpath:attributes"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
-							"xpath:idRelative"
-						]
-					]
-				},
-				{
-					"command": "click",
-					"target": "id=__next",
-					"value": "",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "5d0aadfa-d761-4333-b3f5-82764d7cab97",
-					"targets": [
-						[
-							"id=__next",
-							"id"
-						],
-						[
-							"css=#\\__next",
-							"css:finder"
-						],
-						[
-							"xpath=(//div[@id='__next'])[1]",
-							"xpath:attributes"
-						]
-					]
-				},
-				{
-					"command": "type",
-					"target": "id=:Ril56:",
-					"value": "checking",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "def39f18-126d-48cf-aeb9-6c8ac8031f8b",
-					"targets": [
-						[
-							"id=:Ril56:",
-							"id"
-						],
-						[
-							"name=yt-url",
-							"name"
-						],
-						[
-							"css=#\\3ARil56\\3A",
-							"css:finder"
-						],
-						[
-							"xpath=(//input[@id=':Ril56:'])[1]",
-							"xpath:attributes"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
-							"xpath:idRelative"
-						]
-					]
-				},
-				{
-					"command": "verifyText",
-					"target": "id=:Ril56:-label",
-					"value": "Paste a valid Youtube URL",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"targets": [
-						[
-							"id=:Ril56:-label",
-							"id"
-						],
-						[
-							"css=[data-shrink]",
-							"css:data-attr"
-						],
-						[
-							"css=#\\3ARil56\\3A-label",
-							"css:finder"
-						],
-						[
-							"xpath=(//label[@id=':Ril56:-label'])[1]",
-							"xpath:attributes"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/label)[1]",
-							"xpath:idRelative"
-						],
-						[
-							"xpath=//label[contains(.,'Paste a valid Youtube URL')]",
-							"xpath:innerText"
-						]
-					],
-					"id": "f5f1f54c-efe5-4d2a-abd9-d76660b5d5cb"
-				},
-				{
-					"command": "click",
-					"target": "css=.MuiInputAdornment-root > span",
-					"value": "",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"targets": [
-						[
-							"css=.MuiInputAdornment-root > span",
-							"css:finder"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/div/div/span)[1]",
-							"xpath:idRelative"
-						]
-					],
-					"id": "3b3a81b1-4c46-4fb8-a566-aea620a88f50"
-				},
-				{
-					"command": "verifyElementPresent",
-					"target": "css=.MuiTooltip-tooltip",
-					"value": "",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "4c8aa2e3-ccb4-4aad-ba6a-4aa315d3a958",
-					"targets": [
-						[
-							"css=.MuiTooltip-tooltip",
-							"css:finder"
-						],
-						[
-							"xpath=(//div[@id=':R57alil56:']/div)[1]",
-							"xpath:idRelative"
-						]
-					]
-				},
-				{
-					"command": "click",
-					"target": "id=:Ril56:",
-					"value": "",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "5b17adec-9778-4c58-b78f-29e52fcf27df",
-					"targets": [
-						[
-							"id=:Ril56:",
-							"id"
-						],
-						[
-							"name=yt-url",
-							"name"
-						],
-						[
-							"css=#\\3ARil56\\3A",
-							"css:finder"
-						],
-						[
-							"xpath=(//input[@id=':Ril56:'])[1]",
-							"xpath:attributes"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
-							"xpath:idRelative"
-						]
-					]
-				}
-			]
-		},
-		{
-			"id": "b8fba4eb-8596-44ba-a748-d8384b8aa598",
-			"name": "Validating the search bar with invalid URL",
-			"commands": [
-				{
-					"id": "bcab837d-075e-4398-b4b3-5520d8db458e",
-					"command": "open",
-					"target": "https://yticks.vercel.app/video",
-					"value": ""
-				},
-				{
-					"command": "waitForElementEditable",
-					"target": "id=:Ril56:",
-					"value": "1000",
-					"id": "11ab7088-cb6e-46cc-aa28-11e59e96bfa4"
-				},
-				{
-					"command": "type",
-					"target": "id=:Ril56:",
-					"value": "https://www.youtube.com/watch?v=sAuEeM_6zpk",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "0f0e3184-c5ff-4956-8ed9-e16dc804d687",
-					"targets": [
-						[
-							"id=:Ril56:",
-							"id"
-						],
-						[
-							"name=yt-url",
-							"name"
-						],
-						[
-							"css=#\\3ARil56\\3A",
-							"css:finder"
-						],
-						[
-							"xpath=(//input[@id=':Ril56:'])[1]",
-							"xpath:attributes"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
-							"xpath:idRelative"
-						]
-					]
-				},
-				{
-					"command": "assertValue",
-					"target": "id=:Ril56:",
-					"value": "https://www.youtube.com/watch?v=sAuEeM_6zpk",
-					"id": "1a36e8de-78bb-4a60-9b2d-007644bb318b"
-				},
-				{
-					"command": "verifyText",
-					"target": "id=:Ril56:-label",
-					"value": "You can now search",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "f74f6804-06ce-46a1-8696-b6ed81074362",
-					"targets": [
-						[
-							"id=:Ril56:-label",
-							"id"
-						],
-						[
-							"css=[data-shrink]",
-							"css:data-attr"
-						],
-						[
-							"css=#\\3ARil56\\3A-label",
-							"css:finder"
-						],
-						[
-							"xpath=(//label[@id=':Ril56:-label'])[1]",
-							"xpath:attributes"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/label)[1]",
-							"xpath:idRelative"
-						],
-						[
-							"xpath=//label[contains(.,'You can now search')]",
-							"xpath:innerText"
-						]
-					]
-				},
-				{
-					"command": "click",
-					"target": "css=.MuiIconButton-sizeSmall",
-					"value": "",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "bf59a021-74c5-4759-84ce-82474bcb5f0c",
-					"targets": [
-						[
-							"css=.MuiIconButton-sizeSmall",
-							"css:finder"
-						],
-						[
-							"xpath=(//button[@type='button'])[2]",
-							"xpath:attributes"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/div/div/span/button)[1]",
-							"xpath:idRelative"
-						]
-					]
-				},
-				{
-					"command": "verifyText",
-					"target": "css=.MuiTypography-h6",
-					"value": "YTicks",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "2fbb8b3b-8ffe-4e55-876e-fd11423a697f",
-					"targets": [
-						[
-							"css=.MuiTypography-h6",
-							"css:finder"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div)[1]",
-							"xpath:idRelative"
-						]
-					]
-				},
-				{
-					"command": "mouseOver",
-					"target": "css=.css-xkbv5f",
-					"value": "",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "73494184-e1cf-45da-a9dd-aa319ab8e99f",
-					"targets": [
-						[
-							"css=.css-xkbv5f",
-							"css:finder"
-						],
-						[
-							"xpath=(//button[@type='button'])[1]",
-							"xpath:attributes"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/button)[1]",
-							"xpath:idRelative"
-						]
-					]
-				},
-				{
-					"command": "click",
-					"target": "css=.css-xkbv5f",
-					"value": "",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "77a2624a-060f-4cc4-a6f2-fd45558d56d5",
-					"targets": [
-						[
-							"css=.css-xkbv5f",
-							"css:finder"
-						],
-						[
-							"xpath=(//button[@type='button'])[1]",
-							"xpath:attributes"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/button)[1]",
-							"xpath:idRelative"
-						]
-					]
-				},
-				{
-					"command": "click",
-					"target": "id=:Ril56:",
-					"value": "",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "54f37cb9-f240-4b84-a4f9-a92b4b4df855",
-					"targets": [
-						[
-							"id=:Ril56:",
-							"id"
-						],
-						[
-							"name=yt-url",
-							"name"
-						],
-						[
-							"css=#\\3ARil56\\3A",
-							"css:finder"
-						],
-						[
-							"xpath=(//input[@id=':Ril56:'])[1]",
-							"xpath:attributes"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
-							"xpath:idRelative"
-						]
-					]
-				},
-				{
-					"command": "pause",
-					"target": "600",
-					"value": "",
-					"id": "b26fc7ea-82ca-4bc3-b16a-d9363939c8ee",
-					"comment": "Pausing here until animation completes"
-				},
-				{
-					"command": "sendKeys",
-					"target": "id=:Ril56:",
-					"value": "${KEY_ENTER}",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "47a6d74e-bd55-4dcb-b61a-adffce5be484",
-					"targets": [
-						[
-							"id=:Ril56:",
-							"id"
-						],
-						[
-							"name=yt-url",
-							"name"
-						],
-						[
-							"css=#\\3ARil56\\3A",
-							"css:finder"
-						],
-						[
-							"xpath=(//input[@id=':Ril56:'])[1]",
-							"xpath:attributes"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
-							"xpath:idRelative"
-						]
-					]
-				},
-				{
-					"command": "verifyText",
-					"target": "css=.MuiTypography-h6",
-					"value": "YTicks",
-					"insertBeforeLastCommand": false,
-					"frameLocation": "root",
-					"winHandleId": "root",
-					"id": "aaa814fe-5a3b-47bf-8277-36bd65fbff5b",
-					"targets": [
-						[
-							"css=.MuiTypography-h6",
-							"css:finder"
-						],
-						[
-							"xpath=(//div[@id='__next']/nav/div/div)[1]",
-							"xpath:idRelative"
-						]
-					]
-				}
-			]
-		}
-	],
-	"suites": [
-		{
-			"id": "116e6d91-3b23-4b41-b2f8-f2f507bd7ac8",
-			"name": "SearchBarValidations",
-			"persistSession": false,
-			"parallel": false,
-			"timeout": 300,
-			"tests": [
-				"b8fba4eb-8596-44ba-a748-d8384b8aa598",
-				"a75ae196-3bab-4d1c-b7db-ccd3b331ba6b"
-			]
-		}
-	],
-	"urls": [
-		"https://yticks.vercel.app/"
-	],
-	"plugins": []
+  "id": "12cf557d-37fe-41d1-b514-4fd20dcf1f65",
+  "version": "3.0",
+  "name": "WithVariableNames",
+  "url": "https://yticks.vercel.app/video",
+  "tests": [
+    {
+      "id": "a75ae196-3bab-4d1c-b7db-ccd3b331ba6b",
+      "name": "Validating the search bar",
+      "commands": [
+        {
+          "id": "62bb4987-14e9-4b8d-a0d3-7dcf9936722a",
+          "command": "open",
+          "target": "https://yticks.vercel.app/video",
+          "value": ""
+        },
+        {
+          "comment": "",
+          "command": "setWindowSize",
+          "target": "518x480",
+          "targets": [],
+          "value": "",
+          "id": "162d5c92-c7e2-42ba-830a-bf0ed3455dbf"
+        },
+        {
+          "command": "storeWindowHandle",
+          "target": "root",
+          "value": "",
+          "id": "37eaae53-dd3c-481f-b849-584b4b8d0afc"
+        },
+        {
+          "command": "verifyText",
+          "target": "id=:Ril56:-label",
+          "value": "Paste a valid Youtube URL",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "a44611f1-6fb6-424d-a198-c6a1d6c9435b",
+          "targets": [
+            [
+              "id=:Ril56:-label",
+              "id"
+            ],
+            [
+              "css=[data-shrink]",
+              "css:data-attr"
+            ],
+            [
+              "css=#\\3ARil56\\3A-label",
+              "css:finder"
+            ],
+            [
+              "xpath=(//label[@id=':Ril56:-label'])[1]",
+              "xpath:attributes"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/label)[1]",
+              "xpath:idRelative"
+            ],
+            [
+              "xpath=//label[contains(.,'Paste a valid Youtube URL')]",
+              "xpath:innerText"
+            ]
+          ]
+        },
+        {
+          "command": "verifyElementPresent",
+          "target": "id=:Ril56:",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "cc78547d-b9be-4812-ab27-7d9e99e01afc",
+          "targets": [
+            [
+              "id=:Ril56:",
+              "id"
+            ],
+            [
+              "name=yt-url",
+              "name"
+            ],
+            [
+              "css=#\\3ARil56\\3A",
+              "css:finder"
+            ],
+            [
+              "xpath=(//input[@id=':Ril56:'])[1]",
+              "xpath:attributes"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
+              "xpath:idRelative"
+            ]
+          ],
+          "comment": "search_bar"
+        },
+        {
+          "command": "click",
+          "target": "id=:Ril56:",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "c7cfb6d7-03bc-4cc7-a94e-c97f2b099d44",
+          "targets": [
+            [
+              "id=:Ril56:",
+              "id"
+            ],
+            [
+              "name=yt-url",
+              "name"
+            ],
+            [
+              "css=#\\3ARil56\\3A",
+              "css:finder"
+            ],
+            [
+              "xpath=(//input[@id=':Ril56:'])[1]",
+              "xpath:attributes"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "verifyElementPresent",
+          "target": "css=.MuiInputAdornment-root > span",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "69d3e990-30a4-4d1d-b185-0d0f80fc388b",
+          "targets": [
+            [
+              "css=.MuiInputAdornment-root > span",
+              "css:finder"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/div/div/span)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "click",
+          "target": "css=.MuiInputAdornment-root > span",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "targets": [
+            [
+              "css=.MuiInputAdornment-root > span",
+              "css:finder"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/div/div/span)[1]",
+              "xpath:idRelative"
+            ]
+          ],
+          "id": "c03844dd-46e1-45c8-a978-cabdc32c4b58"
+        },
+        {
+          "command": "pause",
+          "target": "600",
+          "value": "",
+          "id": "3f478ee0-22bb-421b-8968-b8003d84535b",
+          "comment": "we are pausing here as we have a transition on the input search bar when it loses its focus"
+        },
+        {
+          "command": "click",
+          "target": "css=.MuiInputAdornment-root > span",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "e0560c9e-feb4-42cb-95f0-18f51b56e736",
+          "targets": [
+            [
+              "css=.MuiInputAdornment-root > span",
+              "css:finder"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/div/div/span)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "verifyText",
+          "target": "css=.MuiTooltip-tooltip",
+          "value": "Invalid Input",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "bc9a7657-f652-440b-a6f4-6f06828c258d",
+          "targets": [
+            [
+              "css=.MuiTooltip-tooltip",
+              "css:finder"
+            ],
+            [
+              "xpath=(//div[@id=':R57alil56:']/div)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "click",
+          "target": "id=:Ril56:",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "75bbf9fa-4fdc-4695-a31e-4d980788095b",
+          "targets": [
+            [
+              "id=:Ril56:",
+              "id"
+            ],
+            [
+              "name=yt-url",
+              "name"
+            ],
+            [
+              "css=#\\3ARil56\\3A",
+              "css:finder"
+            ],
+            [
+              "xpath=(//input[@id=':Ril56:'])[1]",
+              "xpath:attributes"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "click",
+          "target": "id=__next",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "5d0aadfa-d761-4333-b3f5-82764d7cab97",
+          "targets": [
+            [
+              "id=__next",
+              "id"
+            ],
+            [
+              "css=#\\__next",
+              "css:finder"
+            ],
+            [
+              "xpath=(//div[@id='__next'])[1]",
+              "xpath:attributes"
+            ]
+          ]
+        },
+        {
+          "command": "type",
+          "target": "id=:Ril56:",
+          "value": "checking",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "def39f18-126d-48cf-aeb9-6c8ac8031f8b",
+          "targets": [
+            [
+              "id=:Ril56:",
+              "id"
+            ],
+            [
+              "name=yt-url",
+              "name"
+            ],
+            [
+              "css=#\\3ARil56\\3A",
+              "css:finder"
+            ],
+            [
+              "xpath=(//input[@id=':Ril56:'])[1]",
+              "xpath:attributes"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "verifyText",
+          "target": "id=:Ril56:-label",
+          "value": "Paste a valid Youtube URL",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "targets": [
+            [
+              "id=:Ril56:-label",
+              "id"
+            ],
+            [
+              "css=[data-shrink]",
+              "css:data-attr"
+            ],
+            [
+              "css=#\\3ARil56\\3A-label",
+              "css:finder"
+            ],
+            [
+              "xpath=(//label[@id=':Ril56:-label'])[1]",
+              "xpath:attributes"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/label)[1]",
+              "xpath:idRelative"
+            ],
+            [
+              "xpath=//label[contains(.,'Paste a valid Youtube URL')]",
+              "xpath:innerText"
+            ]
+          ],
+          "id": "f5f1f54c-efe5-4d2a-abd9-d76660b5d5cb"
+        },
+        {
+          "command": "click",
+          "target": "css=.MuiInputAdornment-root > span",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "targets": [
+            [
+              "css=.MuiInputAdornment-root > span",
+              "css:finder"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/div/div/span)[1]",
+              "xpath:idRelative"
+            ]
+          ],
+          "id": "3b3a81b1-4c46-4fb8-a566-aea620a88f50"
+        },
+        {
+          "command": "verifyElementPresent",
+          "target": "css=.MuiTooltip-tooltip",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "4c8aa2e3-ccb4-4aad-ba6a-4aa315d3a958",
+          "targets": [
+            [
+              "css=.MuiTooltip-tooltip",
+              "css:finder"
+            ],
+            [
+              "xpath=(//div[@id=':R57alil56:']/div)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "click",
+          "target": "id=:Ril56:",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "5b17adec-9778-4c58-b78f-29e52fcf27df",
+          "targets": [
+            [
+              "id=:Ril56:",
+              "id"
+            ],
+            [
+              "name=yt-url",
+              "name"
+            ],
+            [
+              "css=#\\3ARil56\\3A",
+              "css:finder"
+            ],
+            [
+              "xpath=(//input[@id=':Ril56:'])[1]",
+              "xpath:attributes"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b8fba4eb-8596-44ba-a748-d8384b8aa598",
+      "name": "Searching for a Video",
+      "commands": [
+        {
+          "id": "bcab837d-075e-4398-b4b3-5520d8db458e",
+          "command": "open",
+          "target": "https://yticks.vercel.app/video",
+          "value": ""
+        },
+        {
+          "command": "setWindowSize",
+          "target": "1280x800",
+          "value": "",
+          "id": "9f1c8c2e-cda5-43f3-93ad-0309d9489d96"
+        },
+        {
+          "command": "storeWindowHandle",
+          "target": "root",
+          "value": "",
+          "id": "bd490c17-a2d6-4795-a1f3-a8fa8bdb80fa"
+        },
+        {
+          "command": "waitForElementEditable",
+          "target": "id=:Ril56:",
+          "value": "1000",
+          "id": "11ab7088-cb6e-46cc-aa28-11e59e96bfa4"
+        },
+        {
+          "command": "type",
+          "target": "id=:Ril56:",
+          "value": "https://www.youtube.com/watch?v=sAuEeM_6zpk",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "0f0e3184-c5ff-4956-8ed9-e16dc804d687",
+          "targets": [
+            [
+              "id=:Ril56:",
+              "id"
+            ],
+            [
+              "name=yt-url",
+              "name"
+            ],
+            [
+              "css=#\\3ARil56\\3A",
+              "css:finder"
+            ],
+            [
+              "xpath=(//input[@id=':Ril56:'])[1]",
+              "xpath:attributes"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "assertValue",
+          "target": "id=:Ril56:",
+          "value": "https://www.youtube.com/watch?v=sAuEeM_6zpk",
+          "id": "1a36e8de-78bb-4a60-9b2d-007644bb318b"
+        },
+        {
+          "command": "verifyText",
+          "target": "id=:Ril56:-label",
+          "value": "You can now search",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "f74f6804-06ce-46a1-8696-b6ed81074362",
+          "targets": [
+            [
+              "id=:Ril56:-label",
+              "id"
+            ],
+            [
+              "css=[data-shrink]",
+              "css:data-attr"
+            ],
+            [
+              "css=#\\3ARil56\\3A-label",
+              "css:finder"
+            ],
+            [
+              "xpath=(//label[@id=':Ril56:-label'])[1]",
+              "xpath:attributes"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/label)[1]",
+              "xpath:idRelative"
+            ],
+            [
+              "xpath=//label[contains(.,'You can now search')]",
+              "xpath:innerText"
+            ]
+          ]
+        },
+        {
+          "command": "click",
+          "target": "css=.MuiIconButton-sizeSmall",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "bf59a021-74c5-4759-84ce-82474bcb5f0c",
+          "targets": [
+            [
+              "css=.MuiIconButton-sizeSmall",
+              "css:finder"
+            ],
+            [
+              "xpath=(//button[@type='button'])[2]",
+              "xpath:attributes"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/div/div/span/button)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "verifyText",
+          "target": "css=.MuiTypography-h6",
+          "value": "YTicks",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "2fbb8b3b-8ffe-4e55-876e-fd11423a697f",
+          "targets": [
+            [
+              "css=.MuiTypography-h6",
+              "css:finder"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "mouseOver",
+          "target": "css=.css-xkbv5f",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "73494184-e1cf-45da-a9dd-aa319ab8e99f",
+          "targets": [
+            [
+              "css=.css-xkbv5f",
+              "css:finder"
+            ],
+            [
+              "xpath=(//button[@type='button'])[1]",
+              "xpath:attributes"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/button)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "click",
+          "target": "css=.css-xkbv5f",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "77a2624a-060f-4cc4-a6f2-fd45558d56d5",
+          "targets": [
+            [
+              "css=.css-xkbv5f",
+              "css:finder"
+            ],
+            [
+              "xpath=(//button[@type='button'])[1]",
+              "xpath:attributes"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/button)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "click",
+          "target": "id=:Ril56:",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "54f37cb9-f240-4b84-a4f9-a92b4b4df855",
+          "targets": [
+            [
+              "id=:Ril56:",
+              "id"
+            ],
+            [
+              "name=yt-url",
+              "name"
+            ],
+            [
+              "css=#\\3ARil56\\3A",
+              "css:finder"
+            ],
+            [
+              "xpath=(//input[@id=':Ril56:'])[1]",
+              "xpath:attributes"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "pause",
+          "target": "600",
+          "value": "",
+          "id": "b26fc7ea-82ca-4bc3-b16a-d9363939c8ee",
+          "comment": "Pausing here until animation completes"
+        },
+        {
+          "command": "sendKeys",
+          "target": "id=:Ril56:",
+          "value": "${KEY_ENTER}",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "47a6d74e-bd55-4dcb-b61a-adffce5be484",
+          "targets": [
+            [
+              "id=:Ril56:",
+              "id"
+            ],
+            [
+              "name=yt-url",
+              "name"
+            ],
+            [
+              "css=#\\3ARil56\\3A",
+              "css:finder"
+            ],
+            [
+              "xpath=(//input[@id=':Ril56:'])[1]",
+              "xpath:attributes"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div[2]/div/input)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "verifyText",
+          "target": "css=.MuiTypography-h6",
+          "value": "YTicks",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "aaa814fe-5a3b-47bf-8277-36bd65fbff5b",
+          "targets": [
+            [
+              "css=.MuiTypography-h6",
+              "css:finder"
+            ],
+            [
+              "xpath=(//div[@id='__next']/nav/div/div)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1b958017-b1ba-4de5-b21b-7b5018a0c187",
+      "name": "Loading More comments",
+      "commands": [
+        {
+          "id": "a888511b-35f5-4daa-9345-46c2b50d31fd",
+          "command": "run",
+          "target": "Searching for a Video",
+          "value": ""
+        },
+        {
+          "command": "storeWindowHandle",
+          "id": "0000-0000-0000-0000",
+          "target": "root",
+          "value": ""
+        },
+        {
+          "command": "pause",
+          "target": "500",
+          "value": "",
+          "id": "625b3e55-1c2e-4d5b-b853-6981355c6314"
+        },
+        {
+          "command": "runScript",
+          "target": "document.querySelector(\".MuiTypography-alignCenter\").scrollIntoView()",
+          "value": "",
+          "id": "6a09e35c-8b32-4176-a7b0-1845ade787e3"
+        },
+        {
+          "command": "verifyText",
+          "target": "css=.MuiTypography-alignCenter",
+          "value": "Show More",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "ad62c961-5843-4b45-bf01-2c0c2295243d",
+          "targets": [
+            [
+              "css=[data-token=\"Z2V0X3JhbmtlZF9zdHJlYW1zLS1DcVlCQ0lBRUZSZTMwVGdhbXdFS2xnRUkyRjhRZ0FRWUJ5S0xBYnVwZnNVcWVFTmQzNXhjQ0JPbS1aTzkwRFpxOUtmUUM5T2ZndUE5UDByWkFyN1BjYXlsamlEOXNjNVhmemZUTWtQYmk1TXBFYWdvVk56enprU0hLclZhRHNPNHdHMDF1T1Q4NUtHdlZ5MWZqQ0xxVU9zdG1PWUtkSUZZenVFcHJNbzAtaTB0dnUzSUQzZTFMWGtqNHFUZ1NMUTJSa1RsVEZBSWRXaVBrYUFoUjBsa0tHZFJScjdPUlFjUUZCSUZDSWNnR0FBU0J3aUVJQkFLR0FFU0JRaUlJQmdBRWdVSWhpQVlBQklIQ0pjZ0VBOFlBUklIQ0lVZ0VBOFlBUklGQ0lrZ0dBQVlBQQ==\"]",
+              "css:data-attr"
+            ],
+            [
+              "css=.MuiListItemButton-root",
+              "css:finder"
+            ],
+            [
+              "xpath=(//div[@id='mui-p-51275-P-comment-box']/div/ul/div)[1]",
+              "xpath:idRelative"
+            ]
+          ],
+          "fallbackTargets": [
+            [
+              "css=.MuiTypography-alignCenter",
+              "css:finder"
+            ],
+            [
+              "xpath=(//div[@id='mui-p-51436-P-comment-box']/div/ul/div/p)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "click",
+          "target": "css=.MuiTypography-alignCenter",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "35770a84-0149-4c68-9c9d-c4c62e6c27ab",
+          "targets": [
+            [
+              "css=.MuiTypography-alignCenter",
+              "css:finder"
+            ],
+            [
+              "xpath=(//div[@id='mui-p-51275-P-comment-box']/div/ul/div/p)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        },
+        {
+          "command": "pause",
+          "target": "500",
+          "value": "",
+          "id": "08943172-a3e3-4934-90cd-9dfe52a40aad"
+        },
+        {
+          "command": "runScript",
+          "target": "document.querySelector(\".MuiTypography-alignCenter\").scrollIntoView()",
+          "value": "",
+          "id": "103a602d-5244-4869-88b4-da5680ec4b05"
+        },
+        {
+          "command": "storeWindowHandle",
+          "target": "root",
+          "value": "",
+          "id": "682e8647-0dcd-4c0b-b27d-6379439bf3fa"
+        },
+        {
+          "command": "storeWindowHandle",
+          "target": "root",
+          "value": "",
+          "id": "7e44a0a4-9519-4644-a99f-c551f4d5f835"
+        },
+        {
+          "command": "click",
+          "target": "css=.MuiTypography-alignCenter",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "4d1b357f-59e7-4fc1-b886-2ddb142b473b",
+          "targets": [
+            [
+              "css=.MuiTypography-alignCenter",
+              "css:finder"
+            ],
+            [
+              "xpath=(//div[@id='mui-p-51275-P-comment-box']/div/ul/div/p)[1]",
+              "xpath:idRelative"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "id": "116e6d91-3b23-4b41-b2f8-f2f507bd7ac8",
+      "name": "SearchBarValidations",
+      "persistSession": false,
+      "parallel": false,
+      "timeout": 300,
+      "tests": [
+        "b8fba4eb-8596-44ba-a748-d8384b8aa598",
+        "a75ae196-3bab-4d1c-b7db-ccd3b331ba6b"
+      ]
+    }
+  ],
+  "urls": [
+    "https://yticks.vercel.app/"
+  ],
+  "plugins": []
 }

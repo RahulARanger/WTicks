@@ -62,17 +62,12 @@ abstract class GeneralizeVariable {
 					// this is required for supporting the run command
 					if (step.command_name == "run") {
 						// we find the test_case_id by the test name
-						const test_name = step.command_name;
-						const test_case = Object.keys(
-							this.parsedTestCases
-						).find(
-							(test_id) =>
-								this.parsedTestCases[test_id].step_name ===
-								test_name
-						);
-
-						if (!test_case) text = false; // if not found
-						else ids.add(test_case); // else we ask the parser to patch its commands too
+						const test_name = step.target;
+						const test_case = this.findTestCaseByName(test_name);
+						if (!test_case) {
+							console.error("Test case not found: " + test_name);
+							text = false; // if not found
+						} else ids.add(test_case); // else we ask the parser to patch its commands too
 					}
 
 					return {
@@ -129,6 +124,12 @@ abstract class GeneralizeVariable {
 		return location;
 	}
 
+	findTestCaseByName(name: string): string | undefined {
+		return (this.parsed?.tests || []).find((test_case) => {
+			return test_case.name === name;
+		})?.id;
+	}
+
 	parseTestStep(testStep: Command): false | ParsedTestStep {
 		return {
 			value: testStep.value,
@@ -137,20 +138,48 @@ abstract class GeneralizeVariable {
 		};
 	}
 
-	parseTestCase(testCase: Test, locatorsEncountered?: Set<string>) {
+	parseTestCase(
+		testCase: Test,
+		locatorsEncountered: Set<string>,
+		testCasesEncountered: Set<string>
+	) {
 		const commands = [];
+		const parsedTestCases = new Set([
+			testCase.id,
+			...Array.from(testCasesEncountered || []),
+		]);
+		const run_test_ids = [];
 
 		for (let command of testCase.commands) {
 			const result = this.parseTestStep(command);
 			if (!result) continue;
+
 			commands.push(result);
 			result.isLocator &&
 				locatorsEncountered &&
 				locatorsEncountered.add(result.target);
+
+			if (result.command_name === "run") {
+				const test_id = this.findTestCaseByName(result.target);
+				if (!test_id || parsedTestCases.has(test_id)) {
+					if (!test_id)
+						console.error(
+							`We have failed to find the locators of ${result.target} test case`
+						);
+					continue;
+				}
+				run_test_ids.push(test_id);
+			}
 		}
+		if (run_test_ids.length)
+			this._parseTestCases(
+				locatorsEncountered,
+				parsedTestCases,
+				...run_test_ids
+			);
 
 		this.parsedTestCases[testCase.id] = {
-			step_name: testCase.name,
+			test_name: testCase.name,
 			commands,
 			id: testCase.id, // required for test case organization in suites
 		};
@@ -174,19 +203,33 @@ abstract class GeneralizeVariable {
 	}
 
 	parseAllTestCases() {
-		return this.parsed?.tests.forEach((test_case) =>
-			this.parseTestCase(test_case)
-		);
+		if (this.parsed?.tests.length)
+			this.parseTestCases(...this.parsed?.tests.map((test) => test.id));
+	}
+
+	_parseTestCases(
+		locatorsEncountered: Set<string>,
+		testCasesEncountered: Set<string>,
+		..._test_ids: string[]
+	) {
+		const test_ids = new Set(
+			_test_ids.filter((_id) => !testCasesEncountered.has(_id))
+		); // has test ids that needs to be parsed as it was not encountered before
+
+		this.parsed?.tests
+			.filter((test) => test_ids.has(test.id))
+			.forEach((test_case) =>
+				this.parseTestCase(
+					test_case,
+					locatorsEncountered,
+					testCasesEncountered
+				)
+			);
 	}
 
 	parseTestCases(..._test_ids: string[]): Set<string> {
-		const test_ids = new Set(_test_ids);
-
 		const result: Set<string> = new Set();
-		this.parsed?.tests
-			.filter((test) => test_ids.has(test.id))
-			.forEach((test_case) => this.parseTestCase(test_case, result));
-
+		this._parseTestCases(result, new Set(), ..._test_ids);
 		return result;
 	}
 
@@ -207,14 +250,16 @@ abstract class GeneralizeVariable {
 export class ToStandaloneScript extends GeneralizeVariable {
 	frameWorkType: string = "Standalone";
 
-	genScript(locators: string[], ...test_case_ids: string[]): string {
-		const func_names: string[] = [];
+	genScript(
+		locators: string[],
+		flow: string[],
+		...test_case_ids: string[]
+	): string {
+		if (flow && !test_case_ids.length) test_case_ids.push(...flow);
 
 		const tests = test_case_ids.map((test_case_id) => {
 			const test = this.parsedTestCases[test_case_id];
-			const func_name = to_good_name(test.step_name.toLowerCase());
-			func_names.push(func_name);
-
+			const func_name = to_good_name(test.test_name);
 			return generate_async_func(
 				func_name,
 				test.commands.map((command) => `\t${command.parsed}`).join("\n")
@@ -231,7 +276,12 @@ export class ToStandaloneScript extends GeneralizeVariable {
 			),
 			"const pageClass = new Locators();",
 			...tests,
-			generating_caller_iife([...func_names, "browser.deleteSession"]),
+			generating_caller_iife([
+				...flow.map((_id) =>
+					to_good_name(this.parsedTestCases[_id].test_name)
+				),
+				"browser.deleteSession",
+			]),
 		].join("\n\n");
 	}
 }
