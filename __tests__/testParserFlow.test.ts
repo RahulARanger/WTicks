@@ -46,7 +46,7 @@ describe("Validating the parsed results based on the type of the file uploaded",
 		});
 
 		test("Now we parse the required suite", function () {
-			expect(parser.parseSuite(test_for_test_suite)).toHaveLength(2); // returns the test ids
+			expect(parser.parseSuite(test_for_test_suite).size).toBe(2); // returns the test ids
 		});
 
 		test("While the suite is parsed, the commands are mapped", function () {
@@ -88,7 +88,7 @@ describe("Validating the parsed results based on the type of the file uploaded",
 		});
 
 		test("while the suite is parsed, it will patch all the required commands", function () {
-			expect(parser.parseSuite(test_for_test_suite)).toHaveLength(2); // returns the ids of the test cases
+			expect(parser.parseSuite(test_for_test_suite).size).toBe(2); // returns the ids of the test cases
 			const test_case = parser.parsedTestCases[test_for_test_case];
 			expect(test_case?.commands?.at(-1)?.parsed).toBe(
 				"await pageClass.AddOrRemoveElementButton.click();"
@@ -238,7 +238,7 @@ describe("Validating the parsed results based on the type of the file uploaded",
 
 		test("Parsing the Suite", function () {
 			const tests = parser.parseSuite(suite_id);
-			expect(tests).toEqual(inside_tests);
+			expect(tests).toEqual(new Set(inside_tests));
 		});
 
 		test("verifying the script generation and ensuring that it only depends on the external locators but not its internal ones", function () {
