@@ -55,11 +55,6 @@ function handleAssertions(step: ParsedTestStep, locator_name: string) {
 		case "assertChecked": {
 			return template + "toBeChecked();";
 		}
-
-		case "assertText": {
-			return template + `toHaveText(${insideQuotes(step.value)});`;
-		}
-
 		case "assertValue": {
 			return template + `toHaveValue(${insideQuotes(step.value)});`;
 		}
@@ -230,11 +225,6 @@ export function parseLocators(locator: string): LocationResult {
 		case "xpath":
 			location = value;
 			break;
-
-		default:
-			console.info(
-				`${location} - not saved as locator, as it is not one.`
-			);
 	}
 
 	return {

@@ -107,7 +107,7 @@ export default class UploadFile extends Component<
 										? `Validating the File Uploaded, size: ${
 												this.state.fileSize / 1e3
 										  } KB`
-										: "Drag and drop to upload .side file"}
+										: "Upload .side file"}
 								</Typography>
 								{this.state.error ? (
 									<Alert
