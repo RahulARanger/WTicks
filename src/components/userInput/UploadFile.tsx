@@ -13,6 +13,7 @@ import Alert from "@mui/material/Alert";
 import uploadFileStyles from "@/styles/uploadFile.module.sass";
 import { motion } from "framer-motion";
 import { eye_raise, tilt_head } from "@/motion/whileHover";
+import { basename } from "path";
 
 export default class UploadFile extends Component<
 	FileUploadProps,
@@ -26,11 +27,15 @@ export default class UploadFile extends Component<
 		if (!fileUploaded) return;
 
 		const size = fileUploaded.size;
+
 		this.setState({ isLoading: true, fileSize: size });
 
 		return new Promise(async (resolve, reject) => {
 			try {
-				await this.props.dispatchDetails(await fileUploaded.text());
+				await this.props.dispatchDetails(
+					await fileUploaded.text(),
+					basename(fileUploaded.name)
+				);
 			} catch (err) {
 				reject(String(err));
 			}
@@ -107,7 +112,7 @@ export default class UploadFile extends Component<
 										? `Validating the File Uploaded, size: ${
 												this.state.fileSize / 1e3
 										  } KB`
-										: "Upload the recorded.side file"}
+										: "Upload the recorded .side file"}
 								</Typography>
 								{this.state.error ? (
 									<Alert

@@ -314,6 +314,9 @@ describe("Validating the parsed results based on the type of the file uploaded",
 			const locators = parser.parseTestCases(test_case);
 			// parses helper_test_case too as it we would need to provide its locators as well
 			expect(locators).toEqual(new Set(Object.keys(patched)));
+			expect(parser.parsedTestCases[test_case].test_name).toBe(
+				"Loading more comments"
+			);
 		});
 
 		test("patching the subset of the names", function () {

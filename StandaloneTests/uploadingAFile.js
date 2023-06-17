@@ -67,6 +67,9 @@ class Locators {
     get uploadFileInput() {
         return this.$("input[accept='.side']")
     }
+    get FileNameChip() {
+        return this.$(".MuiChip-colorInfo > .MuiChip-label");
+    }
 };
 
 
@@ -76,7 +79,7 @@ async function homePage() {
     await browser.url("https://wticks.vercel.app/converter");
     await pageClass.UploadButton.waitForExist({ reverse: false, timeout: 5000 });
     await expect(pageClass.UploadButton).toHaveText("UPLOAD FILE");
-    await expect(pageClass.UploadDesc).toHaveText("Upload the recorded.side file");
+    await expect(pageClass.UploadDesc).toHaveText("Upload the recorded .side file");
     await expect(pageClass.UploadBox).toBePresent();
 
 
@@ -85,7 +88,11 @@ async function homePage() {
 
     await expect(pageClass.UploadAgain).toBePresent();
     await expect(pageClass.UploadAgain).toHaveText("Upload file again");
+
+    await expect(pageClass.FileNameChip).toBePresent();
+    await expect(pageClass.FileNameChip).toHaveText("WithVariableNames.side");
     await expect(pageClass.Alerts).toBePresent();
+
     await expect(pageClass.ScriptViewer).toBePresent();
     await expect(pageClass.DefaultScript).toHaveText("\"Please complete the required info for generating the script ...\"");
     await expect(pageClass.AppTitle).toHaveText("WTicks");

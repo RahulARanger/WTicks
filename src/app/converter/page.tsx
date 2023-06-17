@@ -26,14 +26,14 @@ export default class StandaloneScript extends Component<
 			'console.info("Please complete the required info for generating the script ...");',
 	};
 
-	async parseRaw(data: string) {
+	async parseRaw(data: string, fileName: string) {
 		const parser = new ToStandaloneScript();
 		parser.feed(data);
 		if (!parser.isValidFile())
 			throw new Error("Uploaded file is not a valid file");
 
 		parser.parseAllTestCases();
-		this.setState({ scriptParser: parser });
+		this.setState({ scriptParser: parser, fileName });
 	}
 
 	toGenerate(
@@ -64,8 +64,8 @@ export default class StandaloneScript extends Component<
 		this.setState({
 			scriptGenerated: parser.genScript(
 				Object.keys(locators),
-				Array.from(test_cases || []),
-				...(flow_test_options || [])
+				flow_test_options || [],
+				...Array.from(test_cases || [])
 			),
 		});
 	}
@@ -78,7 +78,7 @@ export default class StandaloneScript extends Component<
 		return (
 			<>
 				<Stack className={uploadFileStyles.normallyInsidePage}>
-					<Header />
+					<Header fileName={this.state.fileName} />
 					<Stack
 						flexDirection="row"
 						sx={{

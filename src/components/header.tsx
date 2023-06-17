@@ -9,7 +9,9 @@ import headerStyles from "@/styles/converter/header.module.sass";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import Chip from "@mui/material/Chip";
 
-interface ConverterHeaderProps {}
+interface ConverterHeaderProps {
+	fileName?: string;
+}
 
 interface ConverterState {}
 
@@ -40,6 +42,11 @@ export default class Header extends Component<
 	renderTools(): ReactNode {
 		return (
 			<Stack flexDirection="row" alignItems={"center"} gap="6px">
+				{this.props.fileName ? (
+					<Chip label={this.props.fileName} color="info" />
+				) : (
+					<></>
+				)}
 				<Chip
 					label="Upload file again"
 					onClick={() => {
