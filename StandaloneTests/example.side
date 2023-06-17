@@ -120,7 +120,7 @@
         },
         {
           "command": "verifyElementPresent",
-          "target": "css=.MuiChip-label",
+          "target": "xpath=//span[contains(@class, 'MuiChip-label')][contains(.,'Upload file again')]",
           "value": "",
           "insertBeforeLastCommand": false,
           "frameLocation": "root",
@@ -140,7 +140,7 @@
         },
         {
           "command": "verifyText",
-          "target": "css=.MuiChip-label",
+          "target": "xpath=//span[contains(@class, 'MuiChip-label')][contains(.,'Upload file again')]",
           "value": "Upload file again",
           "insertBeforeLastCommand": false,
           "frameLocation": "root",
@@ -149,6 +149,16 @@
           "targets": [
             [
               "css=.MuiChip-label",
+              "css:finder"
+            ],
+            [
+              "xpath=//span[contains(.,'Upload file again')]",
+              "xpath:innerText"
+            ]
+          ],
+          "fallbackTargets": [
+            [
+              "css=.MuiButtonBase-root > .MuiChip-label",
               "css:finder"
             ],
             [

@@ -32,7 +32,10 @@ class Locators {
         return this.$(".MuiBox-root > div");
     }
     get UploadAgain() {
-        return this.$(".MuiChip-label");
+        return this.$("//span[contains(@class, 'MuiChip-label')][contains(.,'Upload file again')]");
+    }
+    get FileNameChip() {
+        return this.$(".MuiChip-colorInfo > .MuiChip-label");
     }
     get Alerts() {
         return this.$(".MuiIconButton-colorWarning");
@@ -66,9 +69,6 @@ class Locators {
     }
     get uploadFileInput() {
         return this.$("input[accept='.side']")
-    }
-    get FileNameChip() {
-        return this.$(".MuiChip-colorInfo > .MuiChip-label");
     }
 };
 

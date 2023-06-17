@@ -40,7 +40,7 @@ class Locators {
 
 const pageClass = new Locators();
 
-async function loading_More_comments() {
+async function loading_more_comments() {
 	await searching_for_a_Video();
 	await browser.pause(500);
 	await browser.execute("document.querySelector(\".MuiTypography-alignCenter\").scrollIntoView()");
@@ -68,6 +68,6 @@ async function searching_for_a_Video() {
 }
 
 ; (async () => {
-	await loading_More_comments();
+	await loading_more_comments();
 	await browser.deleteSession();
 })();
