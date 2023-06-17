@@ -1,0 +1,416 @@
+{
+  "id": "3e11c914-830b-4d43-9a8b-89bb1258a19c",
+  "version": "3.0",
+  "name": "WTicks Test Cases",
+  "url": "https://wticks.vercel.app/converter",
+  "urls": [
+    "http://www.google.com"
+  ],
+  "plugins": [],
+  "suites": [
+    {
+      "id": "d3144aab-b284-447b-99c9-e73723d49c33",
+      "name": "New Suite",
+      "parallel": false,
+      "persistSession": false,
+      "tests": [],
+      "timeout": 30000
+    }
+  ],
+  "tests": [
+    {
+      "id": "e7ad9eef-6552-4bb4-ab22-75aa2d48715b",
+      "name": "HomePage",
+      "commands": [
+        {
+          "id": "f082d42d-0c7b-480f-9410-1ba4599a1874",
+          "command": "open",
+          "target": "https://wticks.vercel.app/converter",
+          "value": ""
+        },
+        {
+          "command": "waitForElementPresent",
+          "target": "css=.MuiButtonBase-root",
+          "value": "5000",
+          "id": "8e9917fd-29c8-471d-af50-cefa703a78c3"
+        },
+        {
+          "command": "verifyText",
+          "target": "css=.MuiButtonBase-root",
+          "value": "UPLOAD FILE",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "d7ad3ef5-41f8-4f7c-837e-df4b044b3cc0",
+          "targets": [
+            [
+              "css=.MuiButtonBase-root",
+              "css:finder"
+            ]
+          ],
+          "comment": "UploadButton"
+        },
+        {
+          "command": "verifyText",
+          "target": "css=.MuiTypography-root",
+          "value": "Upload the recorded.side file",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "f51d861b-943d-4cb3-870a-3b27d64752bc",
+          "targets": [
+            [
+              "css=.MuiTypography-root",
+              "css:finder"
+            ],
+            [
+              "xpath=//h6[contains(.,'Upload the recorded.side file')]",
+              "xpath:innerText"
+            ]
+          ],
+          "comment": "UploadDesc"
+        },
+        {
+          "command": "verifyElementPresent",
+          "target": "css=.MuiPaper-root",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "c97af229-bca2-40c2-a8e4-649f2d671bcc",
+          "targets": [
+            [
+              "css=.MuiPaper-root",
+              "css:finder"
+            ]
+          ],
+          "comment": "UploadBox"
+        },
+        {
+          "command": "click",
+          "target": "css=.MuiButtonBase-root",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "e68ebf94-24e5-4147-94e8-1568655dbd3c",
+          "targets": [
+            [
+              "css=.MuiButtonBase-root",
+              "css:finder"
+            ]
+          ],
+          "comment": ""
+        },
+        {
+          "command": "type",
+          "target": "css=.MuiBox-root > div",
+          "value": "C:\\fakepath\\ScrollTest.side",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "a4d54c9a-ad0f-4716-844b-a7850bcef2c7",
+          "targets": [
+            [
+              "css=.MuiBox-root > div",
+              "css:finder"
+            ]
+          ],
+          "comment": "Replace this with `browser.uploadFile` command"
+        },
+        {
+          "command": "verifyElementPresent",
+          "target": "css=.MuiChip-label",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "041c6513-b478-4e60-afa1-1dd568060aa2",
+          "targets": [
+            [
+              "css=.MuiChip-label",
+              "css:finder"
+            ],
+            [
+              "xpath=//span[contains(.,'Upload file again')]",
+              "xpath:innerText"
+            ]
+          ],
+          "comment": "UploadAgain"
+        },
+        {
+          "command": "verifyText",
+          "target": "css=.MuiChip-label",
+          "value": "Upload file again",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "b7ffd0ea-24ff-419e-a9a6-1ef147a0a6de",
+          "targets": [
+            [
+              "css=.MuiChip-label",
+              "css:finder"
+            ],
+            [
+              "xpath=//span[contains(.,'Upload file again')]",
+              "xpath:innerText"
+            ]
+          ]
+        },
+        {
+          "command": "verifyElementPresent",
+          "target": "css=.MuiIconButton-colorWarning",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "89d0a3f0-d2b3-4641-8063-63e6c75ab3a4",
+          "targets": [
+            [
+              "css=.MuiIconButton-colorWarning",
+              "css:finder"
+            ],
+            [
+              "xpath=(//button[@type='button'])[1]",
+              "xpath:attributes"
+            ]
+          ],
+          "comment": "Alerts"
+        },
+        {
+          "command": "verifyElementPresent",
+          "target": "css=.MuiPaper-elevation1",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "9c3f0e22-b644-4c73-9740-dae69f05e079",
+          "targets": [
+            [
+              "css=.MuiPaper-elevation1",
+              "css:finder"
+            ]
+          ],
+          "comment": "ScriptViewer"
+        },
+        {
+          "command": "verifyText",
+          "target": "css=.string",
+          "value": "\"Please complete the required info for generating the script ...\"",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "9ea321d0-dfd4-4a75-aedb-1acb1c98b62b",
+          "targets": [
+            [
+              "css=.string",
+              "css:finder"
+            ],
+            [
+              "xpath=//span[contains(.,'\"Please complete the required info for generating the script ...\"')]",
+              "xpath:innerText"
+            ]
+          ],
+          "comment": "DefaultScript"
+        },
+        {
+          "command": "mouseOver",
+          "target": "css=.MuiIconButton-colorSuccess",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "fe210088-e8b0-461f-a3b9-3cd8296219a4",
+          "targets": [
+            [
+              "css=.MuiIconButton-colorSuccess",
+              "css:finder"
+            ],
+            [
+              "xpath=(//button[@type='button'])[3]",
+              "xpath:attributes"
+            ]
+          ],
+          "comment": "DownloadGeneratedFile"
+        },
+        {
+          "command": "verifyText",
+          "target": "css=.MuiTypography-h6",
+          "value": "WTicks",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "d812afa5-7c6b-40e3-9242-ebcd068121aa",
+          "targets": [
+            [
+              "css=.MuiTypography-h6",
+              "css:finder"
+            ],
+            [
+              "xpath=//h6[contains(.,'WTicks')]",
+              "xpath:innerText"
+            ]
+          ],
+          "comment": "AppTitle"
+        },
+        {
+          "command": "verifyElementPresent",
+          "target": "css=.css-vmlcwe .MuiPaper-root ",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "ac6cec89-981b-4e19-b099-59d6bf0ab421",
+          "targets": [
+            [
+              "css=.css-vmlcwe",
+              "css:finder"
+            ]
+          ],
+          "comment": "TestCaseSelectionPane"
+        },
+        {
+          "command": "verifyElementPresent",
+          "target": "id=grouped-demo",
+          "value": "Pick the Test case/suite to export",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "7dcac051-c717-4374-b1e1-9aa1b9b7c781",
+          "targets": [
+            [
+              "id=grouped-demo",
+              "id"
+            ],
+            [
+              "css=#grouped-demo",
+              "css:finder"
+            ],
+            [
+              "xpath=(//input[@id='grouped-demo'])[1]",
+              "xpath:attributes"
+            ]
+          ],
+          "comment": "PickTheTestCaseOrSuite"
+        },
+        {
+          "command": "click",
+          "target": "id=grouped-demo-label",
+          "value": "",
+          "id": "b30336b7-bed9-4d2c-9c38-4a1c2e4adf82",
+          "fallbackTargets": [
+            [
+              "id=grouped-demo-label",
+              "id"
+            ],
+            [
+              "css=[data-shrink]",
+              "css:data-attr"
+            ],
+            [
+              "css=#grouped-demo-label",
+              "css:finder"
+            ],
+            [
+              "xpath=(//label[@id='grouped-demo-label'])[1]",
+              "xpath:attributes"
+            ],
+            [
+              "xpath=//label[contains(.,'Pick the Test case/suite to export')]",
+              "xpath:innerText"
+            ]
+          ],
+          "comment": "PickTestItemLabel"
+        },
+        {
+          "command": "verifyText",
+          "target": "id=grouped-demo-label",
+          "value": "Pick the Test case/suite to export",
+          "id": "5c108a3d-11f9-4f2c-9937-aac9eef95e43",
+          "fallbackTargets": [
+            [
+              "id=grouped-demo",
+              "id"
+            ],
+            [
+              "css=#grouped-demo",
+              "css:finder"
+            ],
+            [
+              "xpath=(//input[@id='grouped-demo'])[1]",
+              "xpath:attributes"
+            ]
+          ],
+          "comment": ""
+        },
+        {
+          "command": "verifyElementPresent",
+          "target": "css=li:nth-child(1) > .MuiListSubheader-root",
+          "value": "",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "76204867-04d5-4495-815b-2c7be20d79aa",
+          "targets": [
+            [
+              "css=li:nth-child(1) > .MuiListSubheader-root",
+              "css:finder"
+            ],
+            [
+              "xpath=(//ul[@id='grouped-demo-listbox']/li/div)[1]",
+              "xpath:idRelative"
+            ]
+          ],
+          "comment": "OneofTheMenuItem"
+        },
+        {
+          "command": "verifyText",
+          "target": "css=li:nth-child(1) > .MuiListSubheader-root",
+          "value": "Test Suites",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "69973d9e-2278-4334-ab7b-d8d3a97c6a8a",
+          "targets": [
+            [
+              "css=li:nth-child(1) > .MuiListSubheader-root",
+              "css:finder"
+            ],
+            [
+              "xpath=(//ul[@id='grouped-demo-listbox']/li/div)[1]",
+              "xpath:idRelative"
+            ]
+          ],
+          "comment": "TestSuiteMenuLabel"
+        },
+        {
+          "command": "verifyText",
+          "target": "css=li:nth-child(2) > .MuiListSubheader-root",
+          "value": "Test Cases",
+          "insertBeforeLastCommand": false,
+          "frameLocation": "root",
+          "winHandleId": "root",
+          "id": "0202bba6-3e45-4f04-8eb0-2c6146c8c1b3",
+          "targets": [
+            [
+              "css=li:nth-child(2) > .MuiListSubheader-root",
+              "css:finder"
+            ],
+            [
+              "xpath=(//ul[@id='grouped-demo-listbox']/li[2]/div)[1]",
+              "xpath:idRelative"
+            ]
+          ],
+          "comment": "TestCaseMenuLabel"
+        }
+      ]
+    }
+  ],
+  "snapshot": {
+    "dependencies": {},
+    "tests": [],
+    "jest": {
+      "extraGlobals": []
+    }
+  }
+}

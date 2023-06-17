@@ -5,7 +5,7 @@
 
 WTicks enables you to convert the selenium recorded scripts to simple standalone webdriverio scripts.
 
-To Get Started, you can simply upload the file in the [.side](https://www.selenium.dev/selenium-ide/docs/en/introduction/getting-started) file [here](https://wticks.vercel.app/converter).
+To Get Started, you can simply upload the [.side](https://www.selenium.dev/selenium-ide/docs/en/introduction/getting-started) file [here](https://wticks.vercel.app/converter).
 Select the Test case / suite, and then WTicks will fetch all the locators used, name those locators and then you can have your generated script.
 
 Please refer to the output structure and suggest if required.
